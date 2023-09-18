@@ -1,0 +1,132 @@
+<template>
+	<view class="stocktake-main" :style="{height: pageHeight}">
+		<uni-search-bar v-model="page.search.key" placeholder="单据编号输入或扫描" after-confirm-and-focus focus
+			@confirm="reloadList" @cancel="cancel">
+		</uni-search-bar>
+		<uni-card class="flex-1">
+			<view class="flex-row flex-justify-between">
+				<view class="flex-1 flex-row flex-align-center">
+					<uni-icons type="calendar"></uni-icons>
+					<text class="ml-1 text-sub-lg">盘点采集单号</text>
+				</view>
+				<view class="flex-1 flex-row flex-justify-end">
+					<text class="text-sub-lg">盘点类型</text>
+				</view>
+			</view>
+			<view class="flex-1">
+				<z-paging class="mt-3" ref="paging" :fixed="false" use-inner-list v-model="page.list.data" @query="queryList">
+					<template #cell="{item, index}">
+						<pda-item class="mb-2 pb-2" :key="index" :items="page.list.items" :data="item" @arrow-click="itemClick(item)"
+							:arrowRight="true">
+							<template #header="{ row }">
+								<view class="flex-row flex-justify-between flex-1">
+									<view class="flex-1">
+										<text class="text-sub">{{ row.takeCode}}</text>
+									</view>
+									<view class="flex-row flex-justify-end">
+										<text class="text-sub">{{ row.checkType }}</text>
+									</view>
+								</view>
+							</template>
+						</pda-item>
+					</template>
+				</z-paging>
+			</view>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="stocktake-main" setup>
+	import { ref, computed, nextTick } from 'vue'
+	import { onLoad, onShow } from '@dcloudio/uni-app'
+	import { init } from './stocktake-main-core';
+
+	import { pageAsync } from '@/api/modules/wms/stock-take/stock-take-main'
+
+	const { page, itemClick, cancel } = init();
+
+	const paging = ref(null)
+
+	async function queryList(pageIndex : number, pageSize : number) {
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				takeStatus: 0,
+				searchCode: page.search.key
+			}
+
+			const { data } = await pageAsync(params)
+
+			data.forEach((m : any) => { 
+				switch (m.checkType) {
+					case 0:
+						m.checkType = '随机盘'
+						break
+					default:
+						m.checkType = '未知类型'
+						break
+				}
+
+				switch (m.checkMethod) {
+					case 0:
+						m.checkMethod = '明盘'
+						break
+					default:
+						m.checkMethod = '未知类型'
+						break
+				}
+				switch (m.countingStatus) {
+					case 0:
+						m.checkMethod = '初盘'
+						break
+					default:
+						m.countingStatus = '初盘'
+						break
+				}
+
+			})
+			paging.value.complete(data)
+		}
+		catch (error) {
+			paging.value.complete(false)
+		}
+	}
+
+	async function reloadList() {
+		paging.value.reload()
+	}
+	
+	const pageHeight = computed(() => {
+		let height = 0
+	
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+	
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+	
+		return height + 'px'
+	})
+
+	onLoad(() => {
+		page.windowInfo = uni.getWindowInfo()
+	})
+	
+	onShow(() => {
+		nextTick().then(() => {
+			reloadList()
+		})
+	})
+</script>
+
+<style lang="scss" scoped>
+	.stocktake-main {
+		display: flex;
+		background-color: #fff;
+	}
+
+	
+</style>

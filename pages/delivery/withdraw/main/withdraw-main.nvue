@@ -1,0 +1,129 @@
+<template>
+	<view class="withdraw-main" :style="{height: pageHeight}">
+		<uni-search-bar placeholder="单据编号输入或扫描" @confirm="reloadList" @cancel="reloadList" ref='withdrawbillinput'
+			v-model="page.params.keyWords" :focus="true" cancel-text="重置" after-confirm-and-focus>
+		</uni-search-bar>
+
+		<uni-card class="withdraw-main-statistics" margin="10rpx 20rpx" background-color="#5C8DFC">
+			<view class="flex-row flex-align-center flex-justify-between">
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{ page.info.withdrawOrderBillCount }}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">待下架单据总数</text>
+					</view>
+				</view>
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{ page.info.withdrawOrderAssignedTotal }}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">待下架物料总数</text>
+					</view>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1">
+			<view class="flex-row flex-justify-between pb-2">
+				<view class="flex-1 flex-row flex-align-center">
+					<uni-icons type="calendar"></uni-icons>
+					<text class="ml-1">下架单号</text>
+				</view>
+				<view class="flex-1 flex-row flex-justify-end">
+					<text>建议数</text>
+				</view>
+			</view>
+			<view class="flex-1">
+				<z-paging ref="paging" :fixed="false" use-inner-list v-model="page.list.data" @query="queryList" :default-page-size="5">
+					<template #cell="{item, index}">
+						<pda-item class="mb-2 pb-2" :key="index" :items="page.list.items" :data="item"
+						 @arrowClick="itemClick(item)" :arrowRight="true">
+							<template #header="{ row }">
+								<view class="flex-row flex-justify-between flex-1">
+									<view class="flex-1">
+										<text class="text-sub">{{ row.withdrawOrderCode }}</text>
+									</view>
+									<view class="flex-row flex-justify-end pr-2">
+										<text class="text-sub">{{ row.withdrawSuggestionTotal }}</text>
+									</view>
+								</view>
+							</template>
+						</pda-item>
+					</template>
+				</z-paging>
+			</view>
+
+		</uni-card>
+
+	</view>
+</template>
+
+<script lang="ts" name="withdraw-main" setup>
+	import { computed, unref, ref, nextTick } from 'vue'
+	import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
+	import { init } from './withdraw-main-core'
+	
+	const { page, itemClick, queryList, reloadList, paging  } = init({withdrawbillcodeFocus})
+
+	const withdrawbillinput = ref()
+	
+	/**
+	 * 初始化
+	 */
+	onLoad(() => {
+		page.windowInfo = uni.getWindowInfo()
+	})
+	
+	onHide(()=>{
+		// #ifndef APP-PLUS
+		uni.hideKeyboard();
+		// #endif
+		// #ifdef APP-PLUS
+		plus.key.hideSoftKeybord()
+		// #endif
+	})
+	
+	onShow(() => {
+		nextTick().then(() => {
+			reloadList()
+		})
+	})
+	
+	/**
+	 * 获取单据编号输入框焦点
+	 */
+	function withdrawbillcodeFocus() {
+		const _billcode = unref(withdrawbillinput)
+	
+		if (_billcode) {
+			_billcode.toFocus()
+		}
+	}
+	
+	const pageHeight = computed(() => {
+		let height = 0
+	
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+	
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+	
+		return height + 'px'
+	})
+</script>
+
+<style lang="scss" scoped>
+	.withdraw-main {
+		display: flex;
+		background-color: #fff;
+
+		.withdraw-main-statistics {
+			border-radius: 24rpx;
+		}
+	}
+</style>

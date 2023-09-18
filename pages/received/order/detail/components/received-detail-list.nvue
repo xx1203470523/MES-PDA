@@ -1,0 +1,145 @@
+<template>
+	<view class="content">
+		<z-paging ref="paging" class="paging" :fixed="false" use-inner-list v-model="page.data"
+			@query="queryList">
+			<template #cell="{item, index}">
+				<pda-item class="mb-2 pr-2" :key="index" :items="page.items" :data="item">
+					<template #header="{ row }">
+						<view class="flex-1">
+							<text class="text-sub">{{ row?.material?.materialCode || '' }}</text>
+						</view>
+						<view class="flex-1 flex-row flex-justify-end">
+							<text class="text-sub">{{ row?.receiptQuantity }}/{{ row?.diffQuantity }}</text>
+						</view>
+					</template>
+				</pda-item>
+			</template>
+		</z-paging>
+	</view>
+</template>
+
+<script lang="ts" name="received-detail-list" setup>
+	import { ref, reactive, nextTick, watch, withDefaults, unref } from 'vue'
+
+	import { pageDetailAsync } from '@/api/modules/wms/receive/receive-order'
+
+	import type { PdaListItem } from '@/components/pda/pda-list/pda-list-types'
+
+	const props = withDefaults(defineProps<{
+		receiptOrderId : string,
+		materialCode : string,
+		/**
+		 * 0 全部
+		 * 1 差异
+		 * 2 无差异
+		 */
+		searchTypeEnum : number,
+		currentSearchTypeEnum : number
+	}>(), {
+		receiptOrderId: '',
+		materialCode: '',
+		searchTypeEnum: 0,
+		currentSearchTypeEnum: 0
+	})
+
+	const paging = ref(null)
+
+	const page = reactive<{
+		firstLoaded : boolean,
+		data : Array<any>
+		items : Array<PdaListItem>
+	}>({
+		firstLoaded: false,
+		data: [],
+		items: [
+			{
+				label: '通知数',
+				field: 'noticeQuantity'
+			},
+			{
+				label: '物料名称',
+				field: 'material.materialName'
+			},
+			{
+				label: '单位',
+				field: 'material.materialUnit'
+			},
+			{
+				label: '库位',
+				field: 'warehouseBinCode'
+			}
+		]
+	})
+
+	async function queryList(pageIndex : number, pageSize : number) {
+		const _paging = unref(paging)
+
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				receiptOrderId: props.receiptOrderId,
+				materialCode: props.materialCode,
+				searchTypeEnum: props.searchTypeEnum
+			}
+
+			const { data } = await pageDetailAsync(params)
+
+			data.forEach((m : any) => {
+				m.diffQuantity = m.noticeQuantity - m.receiptQuantity
+				if (m.warehouseBins && m.warehouseBins.length > 0) {
+					m.warehouseBinCode = m.warehouseBins.map((bin : any) => `${bin.binCode}(${bin.quantity})`).join('，')
+				} else {
+					m.warehouseBinCode = '暂未收货'
+				}
+			})
+
+			page.firstLoaded = true
+
+			_paging.complete(data)
+		}
+		catch (error) {
+			_paging.complete(false)
+		}
+	}
+
+	function reload() {
+		const _paging = unref(paging)
+		_paging.reload()
+	}
+
+	function reFirst() {
+		page.firstLoaded = false
+	}
+
+	watch(() => props.currentSearchTypeEnum, function (n) {
+		const _paging = unref(paging)
+		if (n === props.searchTypeEnum) {
+			if (!page.firstLoaded) {
+				nextTick().then(() => {
+					_paging.reload()
+				})
+			}
+		}
+	})
+
+	defineExpose({
+		reload,
+		reFirst
+	})
+</script>
+
+<style scoped>
+	.content {
+		flex: 1;
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+
+	.paging {
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+</style>

@@ -1,0 +1,170 @@
+<template>
+	<view class="received-main" :style="{height: pageHeight}">
+		<uni-search-bar v-model="page.search.key" placeholder="单据编号输入或扫描" cancel-text="重置" after-confirm-and-focus focus
+			@confirm="reloadList" @cancel="resetList"></uni-search-bar>
+
+		<uni-card class="received-main-statistics" background-color="#5C8DFC" margin="10rpx 20rpx">
+			<view class="flex-row flex-align-center flex-justify-between">
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{ page.info.waitToOnshelvesOrderTotal }}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub-lg text-white">待上架单据总数</text>
+					</view>
+				</view>
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{ page.info.waitToOnshelvesMaterialTotal }}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub-lg text-white">待上架物料总数</text>
+					</view>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1">
+			<view class="flex-row flex-justify-between pb-2">
+				<view class="flex-1 flex-row flex-align-center">
+					<uni-icons type="calendar"></uni-icons>
+					<text class="ml-1">上架单号</text>
+				</view>
+				<view class="flex-1 flex-row flex-justify-end">
+					<text>建议数</text>
+				</view>
+			</view>
+			<view class="flex-1">
+				<z-paging ref="paging" :fixed="false" use-inner-list v-model="page.list.data" @query="queryList">
+					<template #cell="{item, index}">
+						<pda-item class="mb-2 pb-2" :key="index" :items="page.list.items" :data="item"
+							@arrowClick="itemClick(item)" :arrowRight="true">
+							<template #header="{ row }">
+								<view class="flex-row flex-justify-between flex-1">
+									<view class="flex-1">
+										<text class="text-sub">{{ row.putawayOrderCode }}</text>
+									</view>
+									<view class="flex-row flex-justify-end pr-2">
+										<text
+											class="text-sub">{{ row.suggestion?.putawaySuggestionQuantity || '0' }}</text>
+									</view>
+								</view>
+							</template>
+						</pda-item>
+					</template>
+				</z-paging>
+			</view>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { ref, unref, computed, nextTick } from 'vue'
+
+	import { onLoad, onShow } from '@dcloudio/uni-app'
+
+	import { pageAsync } from '@/api/modules/wms/receive/receive-onshelves'
+
+	import { init } from './onshelves-main-core'
+
+	const { page, itemClick } = init()
+
+	const paging = ref(null)
+
+	async function queryList(pageIndex : number, pageSize : number) {
+		uni.showLoading({
+			title: '数据载入中'
+		})
+
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				//putawaySuggestionCode: page.search.key,
+				//putawayOrderCode:page.search.key,
+				KeyWords: page.search.key
+			}
+
+			const { data, extra } = await pageAsync(params)
+
+			paging.value.complete(data)
+
+			page.info.waitToOnshelvesOrderTotal = extra['waitToOnshelvesOrderTotal']
+			page.info.waitToOnshelvesMaterialTotal = extra['waitToOnshelvesMaterialTotal']
+		}
+		catch (error) {
+			paging.value.complete(false)
+		}
+
+		uni.hideLoading()
+	}
+
+	async function reloadList() {
+		const _paging = unref(paging)
+
+		if (_paging) {
+			paging.value.reload()
+		}
+	}
+
+	async function resetList() {
+		uni.showLoading({
+			title: '数据载入中'
+		})
+
+		try {
+			const params = {
+				pageIndex: 1,
+				pageSize: 5,
+				putawaySuggestionCode: ''
+			}
+
+			const { data, extra } = await pageAsync(params)
+
+			paging.value.complete(data)
+
+			page.info.waitToOnshelvesOrderTotal = extra['waitToOnshelvesOrderTotal']
+			page.info.waitToOnshelvesMaterialTotal = extra['waitToOnshelvesMaterialTotal']
+		}
+		catch (error) {
+			paging.value.complete(false)
+		}
+
+		uni.hideLoading()
+	}
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(() => {
+		page.windowInfo = uni.getWindowInfo()
+	})
+
+	onShow(() => {
+		nextTick().then(() => {
+			reloadList()
+		})
+	})
+</script>
+
+<style lang="scss" scoped>
+	.received-main {
+		display: flex;
+		background-color: #fff;
+
+		.received-main-statistics {
+			border-radius: 24rpx;
+		}
+	}
+</style>

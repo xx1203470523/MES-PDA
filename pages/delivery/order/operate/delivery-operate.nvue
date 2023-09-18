@@ -1,0 +1,260 @@
+<template>
+	<view class="received-operate" :style="{height: pageHeight}">
+		<uni-forms ref="form" class="p-4 bg-white border-bottom" :rules="rules" :modelValue="page.input">
+			<uni-forms-item label="库位" name="warehouseBinCode">
+				<uni-easyinput disabled ref="warehouseBinCodeInput"
+					v-model="page.input.warehouseBinCode"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="条码" name="materialCode" required>
+				<view class="flex-1">
+					<uni-easyinput ref="materialCodeInput" v-model="page.input.materialCode" trim placeholder="扫描或输入"
+						@confirm="materialConfirm"></uni-easyinput>
+				</view>
+				<view class="ml-4 unit-item">
+					<uni-easyinput :value="page.scan.unit" disabled></uni-easyinput>
+				</view>
+			</uni-forms-item>
+			<uni-forms-item label="数量" name="quantity" required>
+				<view class="flex-1 flex-row flex-align-center flex-justify-between">
+					<view class="flex-1">
+						<uni-number-box ref="quantityInput" v-model="page.input.quantity" @confirm="quantityConfirm"
+							@calc="calcFocus" :max="9999999999" ></uni-number-box>
+					</view>
+					<view class="ml-3">
+						<basic-checkbox v-model="page.handle.needConfirmQuantity" label="确认数量"></basic-checkbox>
+					</view>
+				</view>
+			</uni-forms-item>
+		</uni-forms>
+
+		<uni-card>
+			<view class="flex flex-row flex-align-center flex-justify-between">
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">出库数/扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.scan.noticeQuantity}}/{{ page.scan.deliveryQuantity }}</text>
+				</view>
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">总出库数/总扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.info.assignedTotal }}/{{ page.info.deliveryTotal }}</text>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1" padding="0 10rpx">
+			<z-paging ref="paging" :fixed="false" :auto="false" use-inner-list v-model="page.list.data"
+				@query="queryList">
+				<template #cell="{item, index}">
+					<pda-item class="mt-2 pb-2 pr-2" :key="index" :items="page.list.items" :data="item"
+						:no-border="true">
+					</pda-item>
+				</template>
+			</z-paging>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="delivery" setup>
+	import { ref, unref, computed } from 'vue'
+
+	import { onLoad, onReady, onNavigationBarButtonTap } from '@dcloudio/uni-app'
+
+	import { getScanMaterialAsync, getDetailAsync, confirmAsync, getScanMaterialInfoAsync } from '@/api/modules/wms/delivery/delivery-order'
+
+	import { getExchangeStorageBinAsync } from '@/api/modules/wms/common/common-config'
+
+	import { to, back } from '@/utils/route-utils'
+
+	import { init } from './delivery-operate-core';
+	
+	const { page, rules, reloadDetailQuantitySum, materialConfirm, quantityConfirm } = init({ vaild, reloadList, quantityInputFocus, materialCodeInputFocus });
+
+	const paging = ref(null)
+
+	const form = ref()
+
+	const quantityInput = ref()
+
+	const materialCodeInput = ref()
+
+	function materialCodeInputFocus() {
+		const _materialCodeInput = unref(materialCodeInput)
+
+		if (_materialCodeInput) {
+			_materialCodeInput.toFocus()
+		}
+	}
+
+	/**
+	 * 获取数量输入框焦点
+	 */
+	function quantityInputFocus() {
+		const _quantityInput = unref(quantityInput)
+
+		if (_quantityInput) {
+			_quantityInput.toFocus({
+				openKeyboard: true
+			})
+		}
+	}
+
+	/**
+	 * 点击加减按钮后的焦点
+	 */
+	function calcFocus() {
+		if (page.handle.needConfirmQuantity) {
+			quantityInputFocus()
+		} else {
+			materialCodeInputFocus()
+		}
+	}
+
+	/**
+	 * 验证表单
+	 */
+	async function vaild() {
+		const _form = unref(form)
+
+		if (_form) {
+			try {
+				await _form.validate()
+				return true
+			} catch (err) {
+				materialCodeInputFocus()
+				return false
+			}
+		}
+	}
+
+	/**
+	 * 列表查询
+	 */
+	async function queryList() {
+		uni.showLoading({
+			title: '加载中...'
+		})
+
+		const _paging = unref(paging)
+
+		try {	
+			if (page.input.materialCode) {
+				const data = await getScanMaterialInfoAsync({
+					materialCode: page.input.materialCode,
+					deliveryOrderId: page.input.deliveryOrderId
+				})
+
+				if (data) {
+					page.scan.noticeQuantity = data.noticeQuantity
+					page.scan.deliveryQuantity = data.deliveryQuantity
+				}
+				console.log(data)
+
+				materialCodeInputFocus()
+				_paging.complete([data])
+			}
+			else {
+				_paging.complete([])
+			}
+
+		}
+		catch (error) {
+			_paging.complete(false)
+		}
+
+		uni.hideLoading()
+	}
+
+	/**
+	 * 刷新列表
+	 */
+	async function reloadList() {
+		const _paging = unref(paging)
+		await _paging.reload()
+	}
+
+	/**
+	 * 刷新明细
+	 */
+	async function reloadDetail() {
+		const { warehouseId, deliveryOrderCode } = await getDetailAsync(page.input.deliveryOrderId)
+		const warehouseBin = await getExchangeStorageBinAsync({ warehouseId })
+
+		page.info.deliveryOrderCode = deliveryOrderCode
+		page.input.warehouseBinCode = warehouseBin.binCode
+		page.input.warehouseId = warehouseId
+	}
+
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(({ id }) => {
+		page.input.deliveryOrderId = id
+		page.windowInfo = uni.getWindowInfo()
+
+		reloadDetailQuantitySum()
+		reloadDetail()
+	})
+
+	onReady(() => {
+		materialCodeInputFocus()
+	})
+
+	onNavigationBarButtonTap((opt : any) => {
+		if (opt.type == 'menu') {
+			uni.showActionSheet({
+				itemList: ['查看', '完成'],
+				success: (res) => {
+					switch (res.tapIndex) {
+						case 0:
+							to('/pages/delivery/order/detail/delivery-detail?id=' + page.input.deliveryOrderId)
+							break
+
+						case 1:
+							confirmAsync([page.input.deliveryOrderId])
+								.then(_ => {
+									uni.showToast({
+										icon: 'success',
+										title: '出库完成',
+										success: function () {
+											back({
+												redirectUrl: '/pages/delivery/order/main/delivery-main'
+											})
+										}
+									})
+
+								}).catch(() => {
+									materialCodeInputFocus()
+								})
+							break
+					}
+				},
+				fail: () => {
+					materialCodeInputFocus()
+				}
+			})
+		}
+	})
+</script>
+
+<style lang="scss" scoped>
+	.received-operate {
+		display: flex;
+
+		.unit-item {
+			width: 150rpx;
+		}
+	}
+</style>

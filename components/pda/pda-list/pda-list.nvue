@@ -1,0 +1,112 @@
+<template>	
+	<scroll-view :scroll-top="componentPage.scroll.top" scroll-y="true" class="pda-list-container"
+		:style="{'height': height}" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
+		<view class="pda-list-container-item" v-for="(i, index) in data" :key="index" @click="click(i)">
+			<view class="pda-list-container-item-row__header">
+				<slot name="list-header" :row="i"></slot>
+			</view>
+			<view class="pda-list-container-item-row__body">
+				<view class="pda-list-container-item-row__body-content">
+					<view v-for="(item, itemIndex) in items" :key="itemIndex">
+						<view class="pda-list-container-item-row__body-item">
+							<text class="sub-label">{{ item.label }}：</text>
+							<text class="sub-value">{{ fieldGet(i, item.field) || '' }}</text>
+						</view>
+					</view>
+				</view>
+				<view v-if="arrowRight">
+					<uni-icons size="20" type="forward" color="#66600"></uni-icons>
+				</view>
+			</view>
+
+		</view>
+	</scroll-view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { reactive } from 'vue'
+	
+	import { fieldGet } from '@/utils/object-utils'
+
+	const props = defineProps(['items', 'data', 'height', 'arrowRight'])
+	const emits = defineEmits(['click', 'scroll', 'upper', 'lower'])
+	
+	const componentPage = reactive({
+		scroll: {
+			top: 0,
+			oldTop: 0
+		}
+	});
+	
+	function upper(e : any) {
+		emits('upper', e)
+	}
+	
+	function lower(e : any) {
+		emits('lower', e)
+	}
+	
+	function scroll(e : any) {
+		componentPage.scroll.oldTop = e.detail.scrollTop
+		// emits('scroll')
+	}	
+
+	function click(data : any) {
+		emits('click', data)
+	}
+</script>
+
+<style lang="scss" scoped>
+	.pda-list-container {
+		padding: 12rpx 0;
+
+		.pda-list-container-item {
+			display: flex;
+			justify-content: space-between;
+
+			border-bottom: 1px solid #eee;
+
+			// padding-top: 10rpx;
+			// padding-bottom: 20rpx;
+
+			position: relative;
+
+			.pda-list-container-item-row__header {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.pda-list-container-item-row__body {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+
+				// padding: 10rpx 0;
+
+				.pda-list-container-item-row__body-content {
+					display: flex;
+					justify-content: center;
+
+					.pda-list-container-item-row__body-item {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+
+						padding: 10rpx 0;
+
+						.sub-label {
+							color: #666;
+						}
+
+						.sub-value {
+							color: #333;
+						}
+					}
+				}
+			}
+		}
+	}
+</style>

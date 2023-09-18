@@ -1,0 +1,251 @@
+{
+	"pages": [
+		{
+			"path": "pages/tabbar/home/home",
+			"style": {
+				"navigationBarTitleText": "工作台"
+			}
+		},
+		{
+			"path": "pages/tabbar/user/user",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/received/order/main/received-main",
+			"style": {
+				"navigationBarTitleText": "单据收货"
+			}
+		}, {
+			"path": "pages/received/order/operate/received-operate",
+			"style": {
+				"navigationBarTitleText": "单据收货",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/received/order/detail/received-detail",
+			"style": {
+				"navigationBarTitleText": "单据收货"
+			}
+		}, {
+			"path": "pages/received/onshelves/main/onshelves-main",
+			"style": {
+				"navigationBarTitleText": "入库上架"
+			}
+		}, {
+			"path": "pages/received/onshelves/operate/onshelves-operate",
+			"style": {
+				"navigationBarTitleText": "入库上架",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/received/onshelves/detail/onshelves-detail",
+			"style": {
+				"navigationBarTitleText": "入库上架"
+			}
+		}, {
+			"path": "pages/statistics/stockbin/main/stockbin-main",
+			"style": {
+				"navigationBarTitleText": "库位库存",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/delivery/withdraw/main/withdraw-main",
+			"style": {
+				"navigationBarTitleText": "出库下架"
+			}
+		}, {
+			"path": "pages/statistics/material-stock/statistics-material",
+			"style": {
+				"navigationBarTitleText": "物料库存",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/delivery/withdraw/operate/withdraw-operate",
+			"style": {
+				"navigationBarTitleText": "出库下架",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/delivery/withdraw/detail/withdraw-detail",
+			"style": {
+				"navigationBarTitleText": "出库下架"
+			}
+		}, {
+			"path": "pages/delivery/order/main/delivery-main",
+			"style": {
+				"navigationBarTitleText": "出库验证",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/delivery/order/operate/delivery-operate",
+			"style": {
+				"navigationBarTitleText": "出库验证",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		},  {
+			"path": "pages/delivery/order/detail/delivery-detail",
+			"style": {
+				"navigationBarTitleText": "出库验证" 
+			}
+		},{
+			"path": "pages/stock/take/main/stocktake-main",
+			"style": {
+				"navigationBarTitleText": "盘点采集单"
+			}
+		}, {
+			"path": "pages/stock/take/operate/stocktake-operate",
+			"style": {
+				"navigationBarTitleText": "盘点采集单",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/stock/take/detail/stocktake-detail",
+			"style": {
+				"navigationBarTitleText": "盘点采集单"
+			}
+		},
+		{
+			"path": "pages/stock/shift/main/stockshift-main",
+			"style": {
+				"navigationBarTitleText": "直接移位",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/stock/shift/operate/stockshift-add",
+			"style": {
+				"navigationBarTitleText": "新增移位"
+			}
+		},
+		{
+			"path": "pages/stock/shift/detail/stockshift-detail-add",
+			"style": {
+				"navigationBarTitleText": "直接移位",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/stock/shift/details/stockshift-details",
+			"style": {
+				"navigationBarTitleText": "移位明细"
+			}
+		},
+		{
+			"path": "pages/user/operate/password/password-operate",
+			"style": {
+				"navigationBarTitleText": "修改密码"
+			}
+		},
+		{
+			"path": "pages/user/version/version",
+			"style": {
+				"navigationBarTitleText": "版本更新"
+			}
+		},
+		{
+			"path": "pages/user/operate/userinfo/userinfo-operate",
+			"style": {
+				"navigationBarTitleText": "修改密码"
+			}
+		}
+	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"basic-(.*)": "@/components/basic/basic-$1/basic-$1.nvue",
+			"pda-(.*)": "@/components/pda/pda-$1/pda-$1.nvue",
+			"tui-(.*)": "@/components/thorui/tui-$1/tui-$1.vue"
+		}
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarBackgroundColor": "#fff"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#fff",
+		"list": [{
+				"pagePath": "pages/tabbar/home/home",
+				"iconPath": "static/imgs/tabbar/home.png",
+				"selectedIconPath": "static/imgs/tabbar/home-active.png",
+				"text": "工作台"
+			},
+			{
+				"pagePath": "pages/tabbar/user/user",
+				"iconPath": "static/imgs/tabbar/user.png",
+				"selectedIconPath": "static/imgs/tabbar/user-active.png",
+				"text": "我的"
+			}
+		]
+	}
+}

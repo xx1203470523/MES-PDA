@@ -1,0 +1,41 @@
+<template>
+	<view class="basic-checkbox">
+		<checkbox-group @change="changeHandle">
+			<checkbox value="value" :checked="modelValue">
+			</checkbox>
+		</checkbox-group>
+		<view class="basic-label">
+			<text>{{ label }}</text>
+		</view>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	const props = defineProps(['modelValue', 'label'])
+	const emits = defineEmits(['update:modelValue'])
+
+	function changeHandle({ detail }) {
+		const { value } : { value : string[] } = detail
+
+		const index = value.findIndex(m => m === 'value')		
+
+		if (index > -1) {
+			emits('update:modelValue', true)
+		} else {
+			emits('update:modelValue', false)
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.basic-checkbox {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		.basic-label {
+			margin-left: 10rpx;
+		}
+	}
+</style>

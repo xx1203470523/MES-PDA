@@ -1,0 +1,117 @@
+<template>
+	<view class="pda-list-item">
+		<view class="pda-list-item-row__header">
+			<slot name="header" :row="data"></slot>
+		</view>
+		<view class="pda-list-item-row__body">
+			<view class="pda-list-item-radio" v-if="showCheckbox">
+				<checkbox-group @change="changeCheckbox(data, $event)">
+					<checkbox class="sub-radio" value="checked" :checked='data?.showMoveQuantity ?? false' />
+				</checkbox-group>
+			</view>
+			<view class="pda-list-item-row__body-content">
+				<view v-for="(item, itemIndex) in items" :key="itemIndex">
+					<view class="pda-list-item-row__body-item">
+						<text class="sub-label">{{ item.label }}：</text>
+						<text class="sub-value">{{ fieldGet(data, item.field) }}</text>
+					</view>
+				</view>
+
+				<view v-if="showCheckbox && data?.showMoveQuantity">
+					<view class="pda-list-item-row__body-item">
+						<text class="sub-label">数量：</text>
+
+						<uni-number-box :min="1" :max="data?.availableQuantity" class="sub-numberbox"
+							:value="data?.moveQuantity" @change="changeNum($event,data)" />
+					</view>
+				</view>
+			</view>
+			<view v-if="arrowRight">
+				<uni-icons size="20" type="forward" color="#66600"></uni-icons>
+			</view>
+
+		</view>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { fieldGet } from '@/utils/object-utils'
+
+	const props = defineProps(['items', 'data', 'arrowRight', 'showCheckbox'])
+	const emits = defineEmits(['changeCheckbox'])
+	function changeCheckbox(item : any, e : any) {
+		if (e.detail.value.length > 0) {
+			item.showMoveQuantity = true;
+		} else {
+			item.showMoveQuantity = false;
+		}
+
+		emits('changeCheckbox', item, e)
+	}
+	function changeNum(e : any, current : any) {
+		current.moveQuantity = e;
+	}
+</script>
+
+<style lang="scss" scoped>
+	.pda-list-item {
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 1px solid #eee;
+		padding-top: 10rpx;
+		position: relative;
+
+		.pda-list-item-row__header {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			flex: 1;
+		}
+
+		.pda-list-item-row__body {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10rpx 0;
+
+			.pda-list-item-row__body-content {
+				display: flex;
+				justify-content: space-between;
+
+				.pda-list-item-row__body-item {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					padding: 10rpx 0;
+					margin-left: 60rpx;
+
+					.sub-label {
+						color: #666;
+					}
+
+					.sub-value {
+						color: #333;
+					}
+				}
+			}
+
+			.pda-list-item-radio {
+				width: 100rpx;
+				position: absolute;
+				top: 210rpx;
+				left: 0rpx;
+				z-index: 2;
+
+				.sub-radio {
+					transform: scale(1);
+				}
+			}
+		}
+
+		::v-deep .uni-numbox__value {
+			width: 150rpx;
+		}
+	}
+</style>

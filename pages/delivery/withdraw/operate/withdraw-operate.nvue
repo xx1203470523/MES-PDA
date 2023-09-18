@@ -1,0 +1,210 @@
+<template>
+	<view class="withdraw-operate" :style="{height: pageHeight}">
+		<uni-forms ref="form" class="p-4 bg-white border-bottom" :rules="rules" :modelValue="page.input">
+			<uni-forms-item label="库位" name="warehouseBinCode" required>
+				<uni-easyinput ref="warehouseBinCodeInput" v-model="page.input.warehouseBinCode" trim
+					@confirm="warehouseBinCodeConfirm" placeholder="扫描或输入"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="条码" name="materialCode" required>
+				<view class="flex-1">
+					<uni-easyinput ref="materialCodeInput" v-model="page.input.materialCode" trim
+						@confirm="materialConfirm" placeholder="扫描或输入"></uni-easyinput>
+				</view>
+				<view class="ml-4 unit-item">
+					<uni-easyinput :value="page.scan.materialUnit" disabled></uni-easyinput>
+				</view>
+			</uni-forms-item>
+			<uni-forms-item label="数量" name="quantity" required>
+				<view class="flex-1 flex-row flex-align-center flex-justify-between">
+					<uni-number-box ref="quantityInput" v-model:modelValue="page.input.quantity"
+						@confirm="quantityConfirm"></uni-number-box>
+					<view class="ml-3">
+						<basic-checkbox v-model="page.handle.needConfirmQuantity" label="确认数量"></basic-checkbox>
+					</view>
+				</view>
+			</uni-forms-item>
+		</uni-forms>
+
+		<uni-card>
+			<view class="flex flex-row flex-align-center flex-justify-between">
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">下架数/扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.scan.suggestionTotal }}/{{ page.scan.withdrawOrderTotal }}</text>
+				</view>
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">总下架数/总扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.info.suggestionTotal }}/{{ page.info.withdrawOrderTotal }}</text>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1" padding="0" margin="0 20rpx">
+			<view class="withdraw-operate-body__content">
+				<z-paging ref="paging" :fixed="false" :hide-no-more-by-limit="1" use-inner-list v-model="page.list.data"
+					@query="queryList">
+					<template #cell="{item, index}">
+						<pda-item :key="index" :items="page.list.items" :data="item" :arrowRight="false">
+						</pda-item>
+					</template>
+				</z-paging>
+			</view>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="withdraw-operate" setup>
+	import { ref, unref, computed } from 'vue'
+	import { onLoad, onReady, onHide, onNavigationBarButtonTap } from '@dcloudio/uni-app'
+	import { init } from './withdraw-operate-core';
+	import { back } from '@/utils/route-utils'
+
+	const { page, queryList, rules, materialConfirm, quantityConfirm, confirmAsync, paging, reloadDetailQuantitySum, warehouseBinCodeConfirm, reloadDetail, skipAsync } =
+		init({ vaild, quantityInputFocus, materialCodeInputFocus, warehouseBinCodeInputFocus });
+
+	const form = ref()
+	const quantityInput = ref()
+	const warehouseBinCodeInput = ref()
+	const materialCodeInput = ref()
+	/**
+	 * 获取数量输入框焦点
+	 */
+	function quantityInputFocus() {
+		const _quantityInput = unref(quantityInput)
+
+		if (_quantityInput) {
+			_quantityInput.toFocus()
+		}
+	}
+
+	function warehouseBinCodeInputFocus() {
+		const _warehouseBinCodeInput = unref(warehouseBinCodeInput)
+
+		if (_warehouseBinCodeInput) {
+			_warehouseBinCodeInput.toFocus()
+		}
+	}
+
+	function materialCodeInputFocus() {
+		const _materialCodeInput = unref(materialCodeInput)
+
+		if (_materialCodeInput) {
+			_materialCodeInput.toFocus()
+		}
+	}
+
+	/**
+	* 验证表单
+	*/
+	async function vaild() {
+		const _form = unref(form)
+		const _materialCodeInput = unref(materialCodeInput)
+		const _warehouseBinCodeInput = unref(warehouseBinCodeInput)
+
+		if (_form) {
+			try {
+				await _form.validate()
+				return true
+			} catch (err) {
+				switch (err[0].key) {
+					case 'warehouseBinCode':
+						_warehouseBinCodeInput.toFocus()
+						break
+
+					case 'materialCode':
+						_materialCodeInput.toFocus()
+						break
+
+					default:
+						break
+				}
+
+				return false
+			}
+		}
+	}
+
+	onLoad(({ id }) => {
+		page.input.withdrawOrderId = id
+		page.windowInfo = uni.getWindowInfo()
+
+		reloadDetail()
+		reloadDetailQuantitySum()
+	})
+	onReady(() => {
+		warehouseBinCodeInputFocus()
+	})
+	onHide(() => {
+		// #ifndef APP-PLUS
+		uni.hideKeyboard();
+		// #endif
+		// #ifdef APP-PLUS
+		plus.key.hideSoftKeybord()
+		// #endif
+	})
+
+	onNavigationBarButtonTap((opt : any) => {
+		if (opt.type == 'menu') {
+			uni.showActionSheet({
+				itemList: ['查看', '完成', '跳过'],
+				success: (res) => {
+					switch (res.tapIndex) {
+						case 0:
+							uni.navigateTo({
+								url: '/pages/delivery/withdraw/detail/withdraw-detail?id=' + page.input.withdrawOrderId
+							})
+							break
+						case 1:
+							confirmAsync()
+							break
+						case 2:
+							/**
+							 * 跳过后清空条码和库位
+							 */
+
+							page.input.warehouseBinCode = ''
+							page.input.materialCode = ''
+							page.search.materialCode = ''
+
+							skipAsync({
+								Id: page.info.withdrawSuggestionDetailId,
+								WithdrawSuggestionId: page.info.withdrawSuggestionId
+							}).then(_ => {
+
+								queryList()
+							})
+							break
+					}
+				}
+			});
+		}
+	})
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+</script>
+
+<style lang="scss" scoped>
+	.withdraw-operate {
+		display: flex;
+
+		.unit-item {
+			width: 150rpx;
+		}
+
+		.withdraw-operate-body__content {
+			flex: 1;
+		}
+	}
+</style>

@@ -1,0 +1,118 @@
+<template>
+	<scroll-view :scroll-top="componentPage.scroll.top" scroll-y="true" class="h-list-container"
+		:style="{'height': height}" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
+
+		<view class="h-list-container-item" v-for="(i, index) in data" :key="index">
+			<view class="h-list-container-item-radio" v-if="showCheckbox">
+				<checkbox-group @change="changeRadio(i, $event)">
+					<checkbox class="sub-radio" value="checked" />
+				</checkbox-group>
+			</view>
+			<view v-for="(item, itemIndex) in items" :key="itemIndex" class="h-list-container-item-row">
+				<text v-if="item.field.split('.').length>1" class="sub-label">
+					{{ item.label }}：{{ i?.[item.field.split('.')[0]]?.[item.field.split('.')[1]] }}</text>
+				<text v-else class="sub-label">{{ item.label }}：{{ i?.[item.field] }}</text>
+			</view>
+
+			<view class="h-list-container-item-row" v-if="showCheckbox && i?.showMoveQuantity">
+				<text class="sub-label">数量：</text>
+				<uni-number-box :min="1" :max="i?.availableQuantity" class="sub-numberbox" :value="i?.moveQuantity"
+					@change="changeNum($event,i)" />
+			</view>
+		</view>
+
+	</scroll-view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { reactive } from 'vue'
+	const props = defineProps(['items', 'data', 'height', 'arrowRight', 'showCheckbox'])
+	const emits = defineEmits(['click', 'scroll', 'upper', 'lower', 'changeRadio'])
+	const componentPage = reactive({
+		scroll: {
+			top: 0,
+			oldTop: 0
+		}
+	});
+
+	function changeNum(e : any, current : any) {
+		props.data.forEach((item : any) => {
+			if (item.id == current.id) {
+				item.moveQuantity = e;
+			}
+		})
+	}
+	function upper(e : any) {
+		emits('upper', e)
+	}
+
+	function lower(e : any) {
+		emits('lower', e)
+	}
+
+	function scroll(e : any) {
+		componentPage.scroll.oldTop = e.detail.scrollTop
+	}
+
+	function click(data : any) {
+		emits('click', data)
+	}
+	function changeRadio(item : any, e : any) {
+		if (e.detail.value.length > 0) {
+			item.showMoveQuantity = true;
+		} else {
+			item.showMoveQuantity = false;
+		}
+		emits('changeRadio', item, e)
+	}
+</script>
+
+<style lang="scss" scoped>
+	.h-list-container {
+		height: 800rpx;
+		padding: 12rpx 0;
+
+		.h-list-container-item {
+			display: flex;
+			position: relative;
+			border-bottom: 1px solid #eee;
+			padding-bottom: 10rpx;
+
+			.h-list-container-item-row {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+
+				padding: 10rpx 0;
+				margin-left: 60rpx;
+
+				.sub-label {
+					font-size: 30rpx;
+					color: #666;
+				}
+
+				.sub-numberbox {
+					margin-right: 300rpx;
+				}
+			}
+
+			.h-list-container-item-radio {
+				width: 100rpx;
+				position: absolute;
+				top: 240rpx;
+				left: 0rpx;
+				z-index: 2;
+
+				.sub-radio {
+					//z-index: 9;
+					transform: scale(1);
+				}
+			}
+		}
+
+		::v-deep .uni-numbox__value {
+			width: 150rpx;
+		}
+	}
+</style>

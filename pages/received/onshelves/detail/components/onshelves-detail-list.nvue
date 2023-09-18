@@ -1,0 +1,157 @@
+<template>
+	<view class="content">
+		<z-paging ref="paging" class="paging" :fixed="false" use-inner-list v-model="page.data" @query="queryList">
+			<template #cell="{item, index}">
+				<pda-item class="mb-4 p-2" :key="index" :items="page.items" :data="item">
+					<template #header="{ row }">
+						<view class="flex-1">
+							<text>{{ row?.material?.materialCode || '' }}</text>
+						</view>
+						<view class="flex-1 flex-row flex-justify-end">
+							<text>{{ row?.putawayOrderQuantity }}/{{ row?.waitQuantity }}</text>
+						</view>
+					</template>
+				</pda-item>
+			</template>
+		</z-paging>
+	</view>
+</template>
+
+<script lang="ts" name="withdraw-detail-list" setup>
+	import { ref, reactive, nextTick, watch, withDefaults, unref } from 'vue'
+	import { pageDetailApi } from '@/api/modules/wms/receive/receive-onshelves'
+	import type { PdaListItem } from '@/components/pda/pda-list/pda-list-types'
+
+	const props = withDefaults(defineProps<{
+		putawayOrderId : string,
+		materialCode : string,
+		/**
+		 * 0 全部
+		 * 1 差异
+		 * 2 无差异
+		 */
+		searchTypeEnum : number,
+		currentSearchTypeEnum : number
+	}>(), {
+		putawayOrderId: '',
+		materialCode: '',
+		searchTypeEnum: 0,
+		currentSearchTypeEnum: 0
+	})
+
+	const paging = ref(null)
+
+	const page = reactive<{
+		firstLoaded : boolean,
+		data : Array<any>
+		items : Array<PdaListItem>
+	}>({
+		firstLoaded: false,
+		data: [],
+		items: [
+			{
+				label: '通知数',
+				field: 'suggestionQuantity'
+			}, {
+				label: '物料名称',
+				field: 'material.materialName'
+			},
+			{
+				label: '单位',
+				field: 'material.materialUnit'
+			},
+			{
+				label: '实际库位',
+				field: 'warehouseBinCodeReal'
+			},
+			{
+				label: '建议库位',
+				field: 'warehouseBinCode'
+			}
+		]
+	})
+	async function queryList(pageIndex : number, pageSize : number) {
+		const _paging = unref(paging)
+
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				putawayOrderId: props.putawayOrderId,
+				materialCode: props.materialCode,
+				searchTypeEnum: props.searchTypeEnum
+			}
+			//明细分页
+			const { data } = await pageDetailApi(params);
+
+			data.forEach((item : any) => {
+				if (item.putawayOrderDetail) {
+					let _warehouseBinCodeReal = ''
+					item.putawayOrderDetail.forEach((x : any) => {
+						if (_warehouseBinCodeReal == '')
+							_warehouseBinCodeReal = x.warehouseBin?.binCode + `(` + x.putawayOrderQuantity + `)`
+						else
+							_warehouseBinCodeReal += `,` + x.warehouseBin?.binCode + `(` + x.putawayOrderQuantity + `)`
+					});
+					item.warehouseBinCodeReal = _warehouseBinCodeReal
+				}
+
+				if (item.putawaySuggestionDetail) {
+					let _warehouseBinCode = ''
+					item.putawaySuggestionDetail.forEach((x : any) => {
+						if (_warehouseBinCode == '')
+							_warehouseBinCode = x.warehouseBin?.binCode + `(` + x.putawaySuggestionQuantity + `)`
+						else
+							_warehouseBinCode += `,` + x.warehouseBin?.binCode + `(` + x.putawaySuggestionQuantity + `)`
+					});
+					item.warehouseBinCode = _warehouseBinCode
+				}
+
+				//待上架数 = 建议数 - 已上架数 
+				item.waitQuantity = (item?.suggestionQuantity ?? 0) - (item?.putawayOrderQuantity ?? 0)
+			})
+
+			_paging.complete(data)
+
+			//await getPdaGroup()
+		}
+		catch (error) {
+			_paging.value.complete(false)
+		}
+	}
+
+	function dataReload() {
+		const _paging = unref(paging)
+		_paging.reload()
+	}
+
+	watch(() => props.currentSearchTypeEnum, function (n) {
+		const _paging = unref(paging)
+		if (n === props.searchTypeEnum) {
+			if (!page.firstLoaded) {
+				nextTick().then(() => {
+					_paging.reload()
+				})
+			}
+		}
+	})
+
+	defineExpose({
+		dataReload
+	})
+</script>
+
+<style scoped>
+	.content {
+		flex: 1;
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+
+	.paging {
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+</style>

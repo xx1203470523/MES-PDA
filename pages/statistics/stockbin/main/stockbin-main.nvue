@@ -1,0 +1,230 @@
+<template>
+	<view class="statistics-stockBin" :style="{height: pageHeight}">
+		<uni-search-bar placeholder="库位输入或扫描" @confirm="reloadList" @cancel="reloadList" after-confirm-and-focus focus
+			v-model="page.params.binCode"></uni-search-bar>
+
+		<uni-card class="statistics-stockBin-statistics" margin="10rpx 20rpx" background-color="#5C8DFC">
+			<view class="flex-row flex-align-center flex-justify-between">
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{page.list.stockQuantityTotal}}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">库存总数</text>
+					</view>
+				</view>
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{page.list.availableQuantity}}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">库存可用数</text>
+					</view>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1">
+			<view class="statistics-stockBin-body__content">
+				<z-paging ref="paging" :fixed="false" use-inner-list v-model="page.list.data" @query="queryList"
+					:auto="false">
+					<template #cell="{item, index}">
+						<pda-item-checkbox :key="index" :items="page.list.items" :data="item" :arrowRight="false"
+							:showCheckbox="true" @changeCheckbox="changeCheckbox">
+						</pda-item-checkbox>
+					</template>
+				</z-paging>
+			</view>
+		</uni-card>
+
+		<!-- 库位编码输入框 -->、
+		<uni-popup ref="inputDialog" type="dialog" :animation="false">
+			<uni-popup-dialog ref="inputClose" mode="input" title="请输入移入库位" placeholder="输入或者扫描"
+				@confirm="moveStockBind">
+				<uni-easyinput class="ml-4" placeholder="输入或者扫描" v-model="page.operateON.bindCode"
+					@input="typeInput($event)" ref="bindCodeInput"></uni-easyinput>
+			</uni-popup-dialog>
+		</uni-popup>
+	</view>
+</template>
+
+<script lang="ts" name="stockbin" setup>
+	import { ref, unref, computed, nextTick } from 'vue'
+	import { init } from './stockbin-main-core';
+	import { onNavigationBarButtonTap, onLoad, onHide } from '@dcloudio/uni-app'
+	import { startPlay } from '@/utils/voice-utils'
+	import { getListAsync, getPdaGroupAsync, moveStockBindAsync } from '@/api/modules/wms/statistics/statistics-stockBin'
+
+	const { page, changeCheckbox } = init();
+	const paging = ref(null)
+	const inputDialog = ref(null)
+	const bindCodeInput = ref()
+	
+	function bindCodeInputFocus() {
+		const _bindCodeInput = unref(bindCodeInput)
+
+		if (_bindCodeInput) {
+			_bindCodeInput.toFocus()
+		}
+	}	
+
+	/**
+	 * 页面加载事件
+	 */
+	onLoad(function () {
+		page.windowInfo = uni.getWindowInfo()
+	})
+
+	/**
+	 * 查询或刷新重现加载数据
+	 */
+	async function reloadList() {
+		await paging.value.reload()
+	}
+
+	async function typeInput(value : any) {
+		setTimeout(() => {
+			page.operateON.bindCode = value.replace(/[^\a-\z\A-\Z0-9\-\&\_\.]/g, '')
+		}, 0)
+	}
+
+	/**
+	 * 读取接口加载查询列表
+	 */
+	async function queryList(pageIndex : number, pageSize : number) {
+		uni.showLoading({
+			title: '数据载入中'
+		})
+		if (pageIndex == 1) { //清空选中的项
+			page.operateON.selectIds = []
+		}
+		try {
+			page.params.pageIndex = pageIndex
+			page.params.pageSize = pageSize
+
+			const { data } = await getListAsync(page.params)
+			// 默认移动数量为1
+			data.forEach((r : any) => {
+				r.moveQuantity = 1
+			})
+
+			paging.value.complete(data)
+
+			const entity = await getPdaGroupAsync(page.params)
+			page.list.stockQuantityTotal = entity?.stockQuantityTotal
+			page.list.availableQuantity = entity?.availableQuantity
+
+		}
+		catch (error) {
+			paging.value.complete(false)
+		} finally {
+			uni.hideLoading()
+		}
+	}
+
+	/**
+	 * 工具栏按钮事件
+	 */
+	onNavigationBarButtonTap(function () {
+		if (page.operateON.selectIds.length <= 0) {
+			uni.showToast({
+				icon: 'none',
+				title: '请选择物料',
+				duration: 2000
+			});
+			return;
+		}
+		page.operateON.bindCode = ''
+		inputDialog.value.open()
+		nextTick().then(() => {
+			bindCodeInputFocus()
+
+			// #ifndef APP-PLUS
+			uni.hideKeyboard()
+			// #endif
+			// #ifdef APP-PLUS
+			plus.key.hideSoftKeybord()
+			// #endif
+		})
+	})
+
+	/**
+	 * 物料移动库位
+	 */
+	async function moveStockBind() {
+		uni.showLoading({
+			title: "正在处理中...",
+			mask: true
+		})
+		try {
+			const paramList = []
+
+			page.operateON.selectIds.forEach(_id => {
+				const selectItem = page.list.data.find(x => x.id == _id)
+				const parma = {
+					id: _id,
+					quantity: selectItem.moveQuantity,
+					bindCode: page.operateON.bindCode,
+					createdBy: 'pda-User'
+				}
+				paramList.push(parma)
+			})
+
+			await moveStockBindAsync(paramList)
+			//成功提示音
+			startPlay('successVoicePDA')
+			inputDialog.value.close()
+			reloadList();
+			page.operateON.selectIds = []
+			page.operateON.bindCode = ''
+			uni.showToast({
+				icon: 'success',
+				title: '操作成功'
+			});
+
+		} catch {
+			bindCodeInputFocus()
+			//错误提示音
+			startPlay('errorVoicePDA')
+		} finally {
+			uni.hideLoading();
+		}
+	}
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+	onHide(() => {
+		// #ifndef APP-PLUS
+		uni.hideKeyboard();
+		// #endif
+		// #ifdef APP-PLUS
+		plus.key.hideSoftKeybord()
+		// #endif
+	})
+</script>
+
+<style lang="scss" scoped>
+	.statistics-stockBin {
+		display: flex;
+		background-color: #fff;
+
+		.statistics-stockBin-statistics {
+			border-radius: 24rpx;
+		}
+
+		.statistics-stockBin-body__content {
+			flex: 1;
+		}
+	}
+</style>

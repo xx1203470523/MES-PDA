@@ -1,0 +1,121 @@
+<template>
+	<view class="content">
+		<z-paging ref="paging" class="paging" :fixed="false" use-inner-list v-model="page.data" @query="queryList">
+			<template #cell="{item, index}">
+				<pda-item class="mb-2 pr-2" :key="index" :items="page.items" :data="item">
+					<template #header="{ row }">
+						<view class="flex-1">
+							<text class="text-sub">{{ row?.material?.materialCode || '' }}</text>
+						</view>
+						<view class="flex-1 flex-row flex-justify-end">
+							<text class="text-sub">{{ row?.takeQuantity }}/{{ row?.bookQuantity }}</text>
+						</view>
+					</template>
+				</pda-item>
+			</template>
+		</z-paging>
+	</view>
+</template>
+
+<script lang="ts" name="stocktake-detail-list" setup>
+	import { ref, reactive, nextTick, watch, withDefaults, unref } from 'vue'
+	import { getDetailApi } from '@/api/modules/wms/stock-take/stock-take-main'
+	import type { PdaListItem } from '@/components/pda/pda-list/pda-list-types'
+
+	const props = withDefaults(defineProps<{
+		id : string,
+		materialCode : string,
+		/**
+		 * 0 全部
+		 * 1 差异
+		 * 2 无差异
+		 */
+		searchTypeEnum : number,
+		currentSearchTypeEnum : number
+	}>(), {
+		id: '',
+		materialCode: '',
+		searchTypeEnum: 0,
+		currentSearchTypeEnum: 0
+	})
+
+	const paging = ref(null)
+
+	const page = reactive<{
+		firstLoaded : boolean,
+		data : Array<any>
+		items : Array<PdaListItem>
+	}>({
+		firstLoaded: false,
+		data: [],
+		items: [
+			{
+				label: '库位',
+				field: 'warehouseBin.binCode'
+			},
+			{
+				label: '物料名称',
+				field: 'material.materialName'
+			},
+			{
+				label: '单位',
+				field: 'material.materialUnit'
+			}
+		]
+	})
+	async function queryList(pageIndex : number, pageSize : number) {
+		const _paging = unref(paging)
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				id: props.id,
+				materialCode: props.materialCode,
+				searchTypeEnum: props.searchTypeEnum
+			} 
+			//明细分页
+			const { data } = await getDetailApi(params);
+
+			page.firstLoaded = true
+			_paging.complete(data) 
+		}
+		catch (error) {
+			_paging.complete(false)
+		}
+	}
+
+	function reload() {
+		const _paging = unref(paging)
+		_paging.reload()
+	}
+
+	watch(() => props.currentSearchTypeEnum, function (n) {
+		const _paging = unref(paging)
+		if (n === props.searchTypeEnum) {
+			if (!page.firstLoaded) {
+				nextTick().then(() => {
+					_paging.reload()
+				})
+			}
+		}
+	})
+
+	defineExpose({
+		reload
+	})
+</script>
+
+<style scoped>
+	.content {
+		flex: 1;
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+
+	.paging {
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+</style>

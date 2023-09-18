@@ -1,0 +1,305 @@
+<template>
+	<view class="received-operate" :style="{height: pageHeight}">
+		<uni-forms ref="form" class="p-4 bg-white border-bottom" :rules="rules" :modelValue="page.input">
+			<uni-forms-item label="库位" name="warehouseBinCode" required>
+				<uni-easyinput ref="warehouseBinCodeInput" placeholder="扫描或输入" v-model="page.input.warehouseBinCode"
+					trim @confirm="warehouseBinCodeConfirm"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="条码" name="materialCode" required>
+				<view class="flex-1">
+					<uni-easyinput ref="materialCodeInput" placeholder="扫描或输入" v-model="page.input.materialCode" trim
+						@confirm="materialCodeConfirm"></uni-easyinput>
+				</view>
+				<view class="ml-4 unit-item">
+					<uni-easyinput :value="page.scan.unit" disabled></uni-easyinput>
+				</view>
+			</uni-forms-item>
+			<uni-forms-item label="数量" name="quantity" required>
+				<view class="flex-1 flex-row flex-align-center flex-justify-between">
+					<view class="flex-1">
+						<uni-number-box ref="quantityInput" v-model:modelValue="page.input.quantity"
+							@confirm="quantityConfirm" @calc="calcFocus"></uni-number-box>
+					</view>
+					<view class="ml-3">
+						<basic-checkbox v-model="page.handle.needConfirmQuantity" label="确认数量"></basic-checkbox>
+					</view>
+				</view>
+			</uni-forms-item>
+		</uni-forms>
+
+		<uni-card>
+			<view class="flex flex-row flex-align-center flex-justify-between">
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">上架数/扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.scan.suggestionTotal }}/{{ page.scan.putawayOrderTotal }}</text>
+				</view>
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">总上架数/总扫描数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.info.suggestionTotal }}/{{ page.info.putawayOrderTotal }}</text>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1" padding="0 10rpx">
+			<z-paging ref="paging" :fixed="false" use-inner-list :hide-no-more-by-limit="1" v-model="page.list.data"
+				@query="queryList">
+				<template #cell="{item, index}">
+					<pda-item class="mt-2 pb-2 pr-2" :key="index" :items="page.list.items" :data="item"
+						:no-border="true">
+						<template #header>
+							<view class="flex">
+								<view>
+									<text class="text-sub">上架单号：{{ page.info.putawayOrderCode }}</text>
+								</view>
+								<view class="mt-1">
+									<text class="text-sub">上架建议单号：{{ page.info.putawaySuggestionCode }}</text>
+								</view>
+							</view>
+						</template>
+					</pda-item>
+				</template>
+			</z-paging>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { ref, unref, computed } from 'vue'
+
+	import { onLoad, onReady, onNavigationBarButtonTap } from '@dcloudio/uni-app'
+
+	import { pageScanAsync, getDetailAsync, confirmAsync, skipAsync } from '@/api/modules/wms/receive/receive-onshelves'
+
+	import { to, back } from '@/utils/route-utils'
+
+	import { init } from './onshelves-operate-core';
+
+	const paging = ref(null)
+
+	const form = ref()
+
+	const quantityInput = ref()
+
+	const warehouseBinCodeInput = ref()
+
+	const materialCodeInput = ref()
+
+	/**
+	 * 获取数量输入框焦点
+	 */
+	function warehouseBinCodeInputFocus() {
+		const _warehouseBinCodeInput = unref(warehouseBinCodeInput)
+
+		if (_warehouseBinCodeInput) {
+			_warehouseBinCodeInput.toFocus()
+		}
+	}
+
+	/**
+	 * 获取数量输入框焦点
+	 */
+	function quantityInputFocus() {
+		const _quantityInput = unref(quantityInput)
+
+		if (_quantityInput) {
+			_quantityInput.toFocus()
+		}
+	}
+
+	/**
+	 * 获取物料扫描焦点
+	 */
+	function materialCodeInputFocus() {
+		const _materialCodeInput = unref(materialCodeInput)
+		_materialCodeInput.toFocus()
+	}
+
+	/**
+	 * 点击加减按钮后的焦点
+	 */
+	function calcFocus() {
+		if (page.handle.needConfirmQuantity) {
+			quantityInputFocus()
+		} else {
+			materialCodeInputFocus()
+		}
+	}
+
+	/**
+	 * 验证表单
+	 */
+	async function vaild() {
+		const _form = unref(form)
+
+		if (_form) {
+			try {
+				await _form.validate()
+				return true
+			} catch (err) {
+				switch (err[0].key) {
+					case 'warehouseBinCode':
+						warehouseBinCodeInputFocus()
+						break
+
+					case 'materialCode':
+						materialCodeInputFocus()
+						break
+
+					default:
+						break
+				}
+
+				return false
+			}
+		}
+	}
+
+	/**
+	 * 列表查询
+	 */
+	async function queryList(pageIndex : number, pageSize : number) {
+		uni.showLoading({
+			title: '建议加载中...'
+		})
+
+		const _paging = unref(paging)
+
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				putawayOrderId: page.input.putawayOrderId,
+				materialCode: page.input.materialCode
+			}
+
+			const { data } = await pageScanAsync(params)
+
+			//记录建议单Id和对应明细Id，以便实现跳过功能
+			page.info.putawaySuggestionDetailId = data[0]?.id
+			page.info.putawaySuggestionId = data[0]?.suggestionId
+
+			if (data && data.length > 0) {
+				if (page.input.warehouseBinCode.toUpperCase() != data[0].suggestionWarehouseBin.binCode.toUpperCase()) {
+					warehouseBinCodeInputFocus()
+				} else {
+					materialCodeInputFocus()
+				}
+			}
+
+			_paging.complete(data)
+		}
+		catch (error) {
+			_paging.complete(false)
+		}
+
+		uni.hideLoading()
+	}
+
+	/**
+	 * 刷新列表
+	 */
+	async function reloadList() {
+		const _paging = unref(paging)
+		await _paging.reload()
+	}
+
+	/**
+	 * 刷新明细
+	 */
+	async function reloadDetail() {
+		const { warehouseId, putawayOrderCode, putawaySuggestionCode } = await getDetailAsync(page.input.putawayOrderId)
+
+		page.input.warehouseId = warehouseId
+		page.info.putawayOrderCode = putawayOrderCode
+		page.info.putawaySuggestionCode = putawaySuggestionCode
+	}
+
+	const { page, rules, reloadDetailQuantitySum, warehouseBinCodeConfirm, materialCodeConfirm, quantityConfirm } = init({ vaild, reloadList, warehouseBinCodeInputFocus, materialCodeInputFocus, quantityInputFocus });
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(({ id }) => {
+		page.input.putawayOrderId = id
+		page.windowInfo = uni.getWindowInfo()
+
+		reloadDetailQuantitySum()
+		reloadDetail()
+	})
+
+	onReady(() => {
+		warehouseBinCodeInputFocus()
+	})
+
+	onNavigationBarButtonTap((opt : any) => {
+		if (opt.type == 'menu') {
+			uni.showActionSheet({
+				itemList: ['查看', '完成', '跳过'],
+				success: (res) => {
+					switch (res.tapIndex) {
+						case 0:
+							to('/pages/received/onshelves/detail/onshelves-detail?id=' + page.input.putawayOrderId)
+							break
+
+						case 1:
+							confirmAsync([
+								{
+									id: page.input.putawayOrderId
+								}
+							]).then(_ => {
+								uni.showToast({
+									icon: 'success',
+									title: '上架完成',
+									success: function () {
+										back({
+											redirectUrl: '/pages/received/onshelves/main/onshelves-main'
+										})
+									}
+								})
+
+							}
+							)
+						case 2:
+							/**
+							 * 跳过后清空条码和库位
+							 */
+							page.input.warehouseBinCode = ''
+							page.input.materialCode = ''
+							
+							skipAsync({
+								Id: page.info.putawaySuggestionDetailId,
+								PutawaySuggestionId: page.info.putawaySuggestionId
+							}).then(_ => {
+								//这里不应该有有页码的，先传1，1获取建议明细
+								queryList(1, 1)
+							})
+							break
+					}
+				}
+			})
+		}
+	})
+</script>
+
+<style lang="scss" scoped>
+	.received-operate {
+		display: flex;
+
+		.unit-item {
+			width: 150rpx;
+		}
+	}
+</style>

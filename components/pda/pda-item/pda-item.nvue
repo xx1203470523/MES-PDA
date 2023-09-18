@@ -1,0 +1,100 @@
+<template>
+	<view class="pda-list-item" :class="{'pda-list-item-border' : !noBorder}">
+		<view class="pda-list-item-row__header">
+			<slot name="header" :row="data"></slot>
+		</view>
+		<view class="pda-list-item-row__body">
+			<view class="pda-list-item-row__body-content">
+				<view class="pda-list-item-row__body-container" v-for="(item, itemIndex) in items" :key="itemIndex">
+					<view class="pda-list-item-row__body-container__label">
+						<text class="pda-list-item-row__body-container__text">{{ item.label }}：</text>
+					</view>
+					<view class="pda-list-item-row__body-container__value">
+						<text class="flex-1 pda-list-item-row__body-container__text"
+							:style="{'color' : item.color}">{{ fieldGet(data, item.field) || '' }}
+						</text>
+					</view>
+				</view>
+			</view>
+			<view class="pda-list-item-row__arrow" v-if="arrowRight" @click="arrowClick">
+				<uni-icons :size="18" type="forward" color="#66600"></uni-icons>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { fieldGet } from '@/utils/object-utils'
+
+	const props = defineProps(['items', 'data', 'arrowRight', 'noBorder'])
+	const emits = defineEmits(['arrowClick'])
+
+	function arrowClick() {
+		emits('arrowClick', props.data)
+	}
+</script>
+
+<style lang="scss" scoped>
+	.pda-list-item-border {
+		border-bottom: 1px solid #eee;
+	}
+
+	.pda-list-item {
+		display: flex;
+		justify-content: space-between;
+
+		position: relative;
+
+		.pda-list-item-row__header {
+			flex: 1;
+
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.pda-list-item-row__body {
+			margin-top: 10rpx;
+
+			flex: 1;
+
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+
+			.pda-list-item-row__body-content {
+				flex: 1;
+				display: flex;
+
+				.pda-list-item-row__body-container {
+					flex: 1;
+
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-start;
+					
+					margin-bottom: 10rpx;
+					
+					.pda-list-item-row__body-container__label {
+						// width: 180rpx;
+					}
+
+					.pda-list-item-row__body-container__value {
+						flex: 1;
+						width: 350rpx;
+					}
+
+					.pda-list-item-row__body-container__text {
+						font-size: 26rpx;
+					}
+				}
+			}
+
+			.pda-list-item-row__arrow {
+				width: 50rpx;
+			}
+		}
+	}
+</style>

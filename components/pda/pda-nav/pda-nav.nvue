@@ -1,0 +1,61 @@
+<template>
+	<view class="pda-nav">
+		<tui-status-bar></tui-status-bar>
+		<view class="pda-nav-content">
+			<view class="nav-left">
+				<slot name="left"></slot>
+			</view>
+			<view class="nav-title">
+				<text class="nav-title-text">{{ title }}</text>
+			</view>
+			<view class="nav-right">
+				<slot name="right"></slot>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="ts" name="received" setup>
+	import { reactive } from 'vue'
+
+	const props = withDefaults(defineProps<{
+		title : string
+	}>(), {
+		title: '无标题'
+	})
+</script>
+
+<style lang="scss" scoped>
+	.pda-nav {
+		.pda-nav-content {
+			height: 44px;
+
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+
+			.nav-left {
+				flex: 1;
+				padding-left: 20rpx;
+			}
+
+			.nav-title {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+
+				.nav-title-text {
+					font-size: 32rpx;
+					line-height: 30rpx;
+					font-weight: bold;
+				}
+			}
+
+			.nav-right {
+				flex: 1;
+				padding-right: 20rpx;
+			}
+		}
+	}
+</style>

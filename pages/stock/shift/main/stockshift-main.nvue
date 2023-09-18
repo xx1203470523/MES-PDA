@@ -1,0 +1,266 @@
+<template>
+	<view class="stockbin" :style="{height: pageHeight}">
+		<!-- <uni-section title="单据编号" type="line"> -->
+		<uni-search-bar ref="shiftCodeSearchref" placeholder="单据编号输入或者扫描" v-model="page.search.shiftCode"
+			cancel-text="重置" @confirm="shiftCodeSearch" @cancel="shiftCodeResetSearch"></uni-search-bar>
+		<!-- </uni-section> -->
+		<uni-card class="received-main-statistics" background-color="#5C8DFC" margin="10rpx 20rpx">
+			<view class="flex-row flex-align-center flex-justify-between">
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{page.info.billTotalQuantity}}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">待移动单据总数</text>
+					</view>
+				</view>
+				<view class="flex-1 flex flex-align-center p-1">
+					<view>
+						<text class="text-obvious text-white">{{page.info.materialTotalQuantity}}</text>
+					</view>
+					<view class="mt-1">
+						<text class="text-sub text-white">待移动物料总数</text>
+					</view>
+				</view>
+			</view>
+		</uni-card>
+		<uni-card class="flex-1">
+			<view class="flex-row flex-justify-between pb-2">
+				<view class="flex-1 flex-row flex-align-center">
+					<uni-icons type="calendar"></uni-icons>
+					<text class="ml-1">直接移位单号</text>
+				</view>
+				<view class="flex-1 flex-row flex-justify-end">
+					<text>数量</text>
+				</view>
+			</view>
+			<view class="stockshift-body__content">
+				<z-paging ref="paging" :fixed="false" use-inner-list v-model="page.list.data" @query="queryList"
+					:default-page-size="5">
+					<template #cell="{item, index}">
+						<pda-item class="mb-2 pb-2" :key="index" :items="page.list.items" :data="item"
+							@arrowClick="itemClick(item)" :arrowRight="true">
+							<template #header="{ row }">
+								<view class="flex-row flex-justify-between flex-1">
+									<view class="flex-1">
+										<text class="text-sub">{{ row.shiftCode }}</text>
+									</view>
+									<view class="flex-1 flex-row flex-justify-end">
+										<text class="text-sub">{{ row.shiftTotal }}</text>
+									</view>
+								</view>
+							</template>
+						</pda-item>
+					</template>
+				</z-paging>
+			</view>
+		</uni-card>
+		<view class="h-button" v-if="page.isShow.addBtnIsShow">
+			<button class="sub-button" type="primary" @click="nvoToAdd">新增</button>
+		</view>
+
+	</view>
+</template>
+
+<script lang="ts" name="stockshift_main" setup>
+	import { ref, unref, computed, nextTick } from 'vue'
+	import { init } from './stockshift-main-core';
+	import {
+		onNavigationBarButtonTap,
+		onLoad,
+		onHide,
+		onShow
+	} from '@dcloudio/uni-app'
+
+	import { getListApiAsync, getTotalQuanApiAsync } from '@/api/modules/wms/stockshift/stockshift-main'
+
+	const {
+		page,
+		nvoToAdd,
+		itemClick
+	} = init();
+
+	const paging = ref(null)
+
+	const shiftCodeSearchref = ref(null)
+
+	onNavigationBarButtonTap(function () {
+		page.isShow.addBtnIsShow = !page.isShow.addBtnIsShow
+	})
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(function () {
+
+		page.windowInfo = uni.getWindowInfo()
+
+		page.search.shiftCode = ''
+
+		page.list.items.forEach((i) => {
+			i.label
+		})
+
+		getTotal()
+
+	})
+
+	onShow(() => {
+		page.search.shiftCode = ''
+
+		shiftCodeFocus()
+
+		// queryList(1, 5)
+
+		getTotal()
+		
+		
+		nextTick().then(() => {
+			reloadList()
+		})
+	})
+
+	onHide(() => {
+		// #ifndef APP-PLUS
+		uni.hideKeyboard()
+		// #endif
+		// #ifdef APP-PLUS
+		plus.key.hideSoftKeybord()
+		// #endif
+	})
+
+	async function queryList(pageIndex : number, pageSize : number) {
+		shiftCodeFocus()
+		try {
+			const params = {
+				pageIndex,
+				pageSize,
+				shiftStatus: 0,
+				shiftCode: page.search.shiftCode
+			}
+
+			const { data } = await getListApiAsync(params)
+
+			//console.log(data)
+
+			paging.value.complete(data)
+
+
+		}
+		catch (error) {
+			paging.value.complete(false)
+		}
+		// finally{
+		// 	shiftCodeFocus()
+		// }
+	}
+
+	async function shiftCodeSearch() {
+
+		shiftCodeFocus()
+
+		try {
+			const params = {
+				pageIndex: 1,
+				pageSize: 5,
+				shiftStatus: 0,
+				shiftCode: page.search.shiftCode
+			}
+
+			const { data } = await getListApiAsync(params)
+
+			paging.value.complete(data)
+		}
+		catch (error) {
+			paging.value.complete(false)
+		}
+	}
+
+	//获取汇总数量
+	async function getTotal() {
+		const params_totalQuan = {
+			shiftCode: page.search.shiftCode
+		}
+
+		const { billTotalQuantity, materialTotalQuantity } = await getTotalQuanApiAsync(params_totalQuan)
+
+		page.info.billTotalQuantity = billTotalQuantity
+
+		page.info.materialTotalQuantity = materialTotalQuantity
+	}
+
+	function shiftCodeFocus() {
+		const _shiftCodeSearchref = unref(shiftCodeSearchref)
+
+		if (_shiftCodeSearchref) {
+			_shiftCodeSearchref.toFocus()
+		}
+	}
+
+	function reloadList() {
+		const _paging = unref(paging)
+
+		if (_paging) {
+			_paging.reload()
+		}
+	}
+
+	//重置
+	async function shiftCodeResetSearch() {
+
+		shiftCodeFocus()
+
+		setTimeout(() => {
+			reloadList()
+		}, 0)
+		// try {
+		// 	const params = {
+		// 		pageIndex: 1,
+		// 		pageSize: 5,
+		// 		shiftStatus: 0,
+		// 		shiftCode: ''
+		// 	}
+
+		// 	const { data } = await getListApiAsync(params)
+
+		// 	paging.value.complete(data)
+		// }
+		// catch (error) {
+		// 	paging.value.complete(false)
+		// }
+	}
+</script>
+
+<style lang="scss" scoped>
+	.stockbin {
+		display: flex;
+		background-color: #fff;
+
+		.stockshift-body__content {
+			border-radius: 24rpx;
+			flex: 1;
+		}
+
+		.h-button {
+			width: 700rpx;
+			//align-self: center;
+			margin-bottom: 20rpx;
+			margin-left: 25rpx;
+
+			.sub-button {
+				border-radius: 24rpx;
+			}
+		}
+	}
+</style>

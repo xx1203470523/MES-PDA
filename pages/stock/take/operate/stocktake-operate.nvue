@@ -1,0 +1,208 @@
+<template>
+	<view class="take-operate" :style="{height: pageHeight}">
+		<uni-forms ref="form" class="p-4 bg-white border-bottom" :rules="rules" :modelValue="page.input">
+			<uni-forms-item label="库位" name="binCode" required>
+				<uni-easyinput ref="binCodeInput" v-model="page.input.binCode" trim placeholder="扫描或输入"
+					@confirm="binConfirm"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="条码" name="materialCode" required>
+				<view class="flex-1">
+					<uni-easyinput ref="materialCodeInput" v-model="page.input.materialCode" trim placeholder="扫描或输入"
+						@confirm="materialConfirm"></uni-easyinput>
+				</view>
+				<view class="ml-4 unit-item">
+					<uni-easyinput :value="page.scan.unit" disabled></uni-easyinput>
+				</view>
+			</uni-forms-item>
+			<uni-forms-item label="数量" name="quantity" required>
+				<view class="flex-1 flex-row flex-align-center flex-justify-between">
+					<view class="flex-1">
+						<uni-number-box ref="quantityInput" v-model:modelValue="page.input.quantity" 
+							@confirm="quantityConfirm"></uni-number-box>
+					</view>
+					<view class="ml-3">
+						<basic-checkbox v-model="page.handle.needConfirmQuantity" label="确认数量"></basic-checkbox>
+					</view>
+				</view>
+			</uni-forms-item>
+		</uni-forms>
+
+		<uni-card>
+			<view class="flex flex-row flex-align-center flex-justify-between">
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">扫描数/库存数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.info.quantity||0 }}/{{ page.info.bookQuantity||0  }}</text>
+				</view>
+				<view class="flex flex-1 flex-align-center">
+					<text class="flex-1 text-center text-sub">总扫描数/总库存数</text>
+					<text
+						class="flex-1 text-center text-obvious mt-1">{{ page.info.takeTotal||0 }}/{{ page.info.bookTotal||0 }}</text>
+				</view>
+			</view>
+		</uni-card>
+
+		<uni-card class="flex-1">
+			<pda-list v-if="page.list.data" :items="page.list.items" :data="page.list.data" :no-border="true">
+			</pda-list>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="take-operate" setup>
+	import { ref, unref, computed } from 'vue'
+	import { onLoad, onReady, onNavigationBarButtonTap } from '@dcloudio/uni-app'
+	import { to, back } from '@/utils/route-utils'
+	import { confirmAsync } from '@/api/modules/wms/stock-take/stock-take-main'
+	import { init } from './stocktake-operate-core';
+
+	const form = ref()
+	const quantityInput = ref()
+
+	const binCodeInput = ref()
+
+	const materialCodeInput = ref()
+
+	/**
+	 * 获取库位输入框焦点
+	 */
+	function binCodeInputFocus() {
+		const _binCodeInput = unref(binCodeInput)
+
+		if (_binCodeInput) {
+			_binCodeInput.toFocus()
+		}
+	}
+	/**
+	 * 获取物料扫描焦点
+	 */
+	function materialCodeInputFocus() {
+		const _materialCodeInput = unref(materialCodeInput)
+		_materialCodeInput.toFocus()
+	}
+	/**
+	 * 获取数量输入框焦点
+	 */
+	function quantityInputFocus() {
+		const _quantityInput = unref(quantityInput)
+
+		if (_quantityInput) {
+			_quantityInput.toFocus()
+		}
+	}
+
+	/**
+	* 验证表单
+	 */
+	async function vaild() {
+		const _form = unref(form)
+		const _materialCodeInput = unref(materialCodeInput)
+		const _binCodeInput = unref(binCodeInput)
+
+		if (_form) {
+			try {
+				await _form.validate()
+				return true
+			} catch (err) {
+				switch (err[0].key) {
+					case 'binCode':
+						_binCodeInput.toFocus()
+						break
+
+					case 'materialCode':
+						_materialCodeInput.toFocus()
+						break
+
+					default:
+						break
+				}
+
+				return false
+			}
+		}
+	}
+
+	const { page,
+		reloadDetailInfo, reloadDetailQuantitySum, rules, binConfirm, materialConfirm, quantityConfirm } = init({ vaild, binCodeInputFocus, quantityInputFocus, materialCodeInputFocus });
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+	onLoad(({ id, code }) => {
+		page.input.id = id
+		page.input.code = code
+		page.windowInfo = uni.getWindowInfo()
+
+		reloadDetailInfo()
+		reloadDetailQuantitySum()
+	})
+
+	onReady(() => {
+		binCodeInputFocus()
+	})
+	onNavigationBarButtonTap((opt : any) => {
+		if (opt.type == 'menu') {
+			uni.showActionSheet({
+				itemList: ['查看', '完成'],
+				success: (res) => {
+					if (res.tapIndex == 0) {
+						to('/pages/stock/take/detail/stocktake-detail?id=' + page.input.id + '&code=' + page.input.code)
+					}
+					else if (res.tapIndex == 1) {
+						confirmAsync([
+							{
+								id: page.input.id
+							}
+						]).then(_ => {
+							uni.showToast({
+								icon: 'success',
+								title: '盘点采集完成',
+								success: function () {
+									back({
+										redirectUrl: '/pages/stock/take/main/stocktake-main'
+									})
+								}
+							})
+
+						})
+					}
+				}
+			})
+		}
+	})
+</script>
+
+<style lang="scss" scoped>
+	.take-operate {
+		display: flex;
+
+		.unit-item {
+			width: 150rpx;
+		}
+
+		.operate-item {
+			flex: 1;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+
+			.unit-item {
+				width: 150rpx;
+			}
+		}
+
+		::v-deep .uni-numbox__value {
+			width: 100px;
+		}
+	}
+</style>
