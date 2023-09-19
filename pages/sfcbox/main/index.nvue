@@ -1,0 +1,51 @@
+<template>
+	<view class="" :style="{height: pageHeight}">
+
+		<!-- 	<tui-input placeholder="输入箱码或扫描" cancel-text="重置"
+				after-confirm-and-focus focus></tui-input> -->
+
+		<uni-card class="ucard">
+			<tui-input focus autofocus required label="箱码" placeholder="请输入或扫描箱码" clearable v-model="boxsfc"></tui-input>
+		</uni-card>
+		<uni-card class="ucard">
+			<tui-input required label="工单" placeholder="请输入扫描工单" clearable v-model="workordercode"></tui-input>
+		</uni-card>
+		<uni-card class="ucard">
+			<tui-form-button text="验证"></tui-form-button>
+		</uni-card>
+	</view>
+</template>
+
+<script lang="ts" name="sfcbox" setup>
+	import { ref, computed, unref, nextTick } from 'vue'
+
+	import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
+
+	import { fieldGet } from '@/utils/object-utils'
+
+	// import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
+
+	import { init } from './index-core'
+
+	const { page } = init()
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+
+		// #ifndef APP
+		// height = page.windowInfo.windowHeight - 44
+		// #endif
+
+		return height + 'px'
+	})
+</script>
+
+<style>
+	.ucard {
+		margin: 10rpx 0;
+	}
+</style>

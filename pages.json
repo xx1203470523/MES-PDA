@@ -19,185 +19,24 @@
 			}
 		},
 		{
-			"path": "pages/received/order/main/received-main",
+			"path": "pages/sfcbox/main/index",
 			"style": {
-				"navigationBarTitleText": "单据收货"
+				"navigationBarTitleText": "箱码校验"
 			}
-		}, {
-			"path": "pages/received/order/operate/received-operate",
-			"style": {
-				"navigationBarTitleText": "单据收货",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/received/order/detail/received-detail",
-			"style": {
-				"navigationBarTitleText": "单据收货"
-			}
-		}, {
-			"path": "pages/received/onshelves/main/onshelves-main",
-			"style": {
-				"navigationBarTitleText": "入库上架"
-			}
-		}, {
-			"path": "pages/received/onshelves/operate/onshelves-operate",
-			"style": {
-				"navigationBarTitleText": "入库上架",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/received/onshelves/detail/onshelves-detail",
-			"style": {
-				"navigationBarTitleText": "入库上架"
-			}
-		}, {
-			"path": "pages/statistics/stockbin/main/stockbin-main",
-			"style": {
-				"navigationBarTitleText": "库位库存",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/delivery/withdraw/main/withdraw-main",
-			"style": {
-				"navigationBarTitleText": "出库下架"
-			}
-		}, {
-			"path": "pages/statistics/material-stock/statistics-material",
-			"style": {
-				"navigationBarTitleText": "物料库存",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/delivery/withdraw/operate/withdraw-operate",
-			"style": {
-				"navigationBarTitleText": "出库下架",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/delivery/withdraw/detail/withdraw-detail",
-			"style": {
-				"navigationBarTitleText": "出库下架"
-			}
-		}, {
-			"path": "pages/delivery/order/main/delivery-main",
-			"style": {
-				"navigationBarTitleText": "出库验证",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/delivery/order/operate/delivery-operate",
-			"style": {
-				"navigationBarTitleText": "出库验证",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		},  {
-			"path": "pages/delivery/order/detail/delivery-detail",
-			"style": {
-				"navigationBarTitleText": "出库验证" 
-			}
-		},{
-			"path": "pages/stock/take/main/stocktake-main",
-			"style": {
-				"navigationBarTitleText": "盘点采集单"
-			}
-		}, {
-			"path": "pages/stock/take/operate/stocktake-operate",
-			"style": {
-				"navigationBarTitleText": "盘点采集单",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		}, {
-			"path": "pages/stock/take/detail/stocktake-detail",
-			"style": {
-				"navigationBarTitleText": "盘点采集单"
-			}
-		},
-		{
-			"path": "pages/stock/shift/main/stockshift-main",
-			"style": {
-				"navigationBarTitleText": "直接移位",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		},
-		{
-			"path": "pages/stock/shift/operate/stockshift-add",
-			"style": {
-				"navigationBarTitleText": "新增移位"
-			}
-		},
-		{
-			"path": "pages/stock/shift/detail/stockshift-detail-add",
-			"style": {
-				"navigationBarTitleText": "直接移位",
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "menu"
-						}]
-					}
-				}
-			}
-		},
-		{
-			"path": "pages/stock/shift/details/stockshift-details",
-			"style": {
-				"navigationBarTitleText": "移位明细"
-			}
-		},
+		  },
+		  // {
+		// 	"path": "pages/sfcbox/main/index-box",
+		// 	"style": {
+		// 		"navigationBarTitleText": "单据收货",
+		// 		"app-plus": {
+		// 			"titleNView": {
+		// 				"buttons": [{
+		// 					"type": "menu"
+		// 				}]
+		// 			}
+		// 		}
+		// 	}
+		// },  		
 		{
 			"path": "pages/user/operate/password/password-operate",
 			"style": {
