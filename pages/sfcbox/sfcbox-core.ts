@@ -1,6 +1,25 @@
 import { reactive } from "vue";
 
-export const rules = {}
+import { sfcboxValidateScanAsync} from '@/api/modules/sfcbox/sfc-box'
+
+export const rules = {
+	boxCode: {
+		rules: [
+			{
+				required: true,
+				errorMessage: '请输入工号',
+			}
+		]
+	},
+	orderCode: {
+		rules: [
+			{
+				required: true,
+				errorMessage: '请输入工号',
+			}
+		]
+	}
+}
 
 export function init({
 	boxCodeInputFocus,
@@ -38,11 +57,21 @@ export function init({
 	/**
 	 * 点击验证按钮
 	 */
-	function verifyClick() {
+	async function verifyClick() {
+		const { msg } = await sfcboxValidateScanAsync({
+						sfcboxCode: page.input.boxCode,
+						orderCode: page.input.orderCode
+					})
+					
 		uni.showModal({
-			title: '消息提示',
+			title: msg,
 			showCancel: false
 		})
+		
+		// uni.showToast({
+		// 	title: '请求异常',
+		// 	icon: 'none'
+		// })
 	}
 
 	return {

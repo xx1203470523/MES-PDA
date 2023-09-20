@@ -1,7 +1,8 @@
 import { computed, reactive } from "vue";
 
 import { useUserStore } from '@/store/user'
-import { useCommonSettingsStore } from '@/store/commonsettings'
+
+// import { useCommonSettingsStore } from '@/store/commonsettings'
 
 import { setCache } from '@/utils/cache-utils'
 import { redirectTo } from '@/utils/route-utils'
@@ -30,7 +31,7 @@ export const rules = {
 export function init({ vaild }) {
 	const userStore = useUserStore()
 	
-	const userCommonSetting = useCommonSettingsStore()
+	// const userCommonSetting = useCommonSettingsStore()
 	
 	const page = reactive<{
 		windowInfo ?: UniNamespace.GetWindowInfoResult,
@@ -68,7 +69,7 @@ export function init({ vaild }) {
 			userStore.setToken(data.token)
 			
 			//获取系统配置
-			await userCommonSetting.getCommonSettingsAsync()
+			// await userCommonSetting.getCommonSettingsAsync()
 
 			setCache({
 				key: 'token',

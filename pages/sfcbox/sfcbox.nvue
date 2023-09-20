@@ -1,17 +1,32 @@
 <template>
 	<view class="sfcbox" :style="{minHeight: pageHeight}">
-		<uni-forms ref="form" errShowType="toast" :rules="rules" :modelValue="page.input">
-			<uni-forms-item label="箱码" name="boxCode" required>
-				<uni-easyinput ref="boxCodeInputRef" v-model="page.input.boxCode" placeholder="请扫描箱码"
-					@confirm="boxCodeConfirm"></uni-easyinput>
-			</uni-forms-item>
-			<uni-forms-item label="工单" name="orderCode" required>
-				<uni-easyinput ref="orderCodeInputRef" v-model="page.input.orderCode" placeholder="请扫描工单"
-					@confirm="orderCodeConfirm"></uni-easyinput>
-			</uni-forms-item>
-		</uni-forms>
+		<view class="flex flex-1">
+			<view class="p-1">
+				<uni-forms ref="form" errShowType="toast" :rules="rules" :modelValue="page.input">
+					<uni-forms-item label="箱码" name="boxCode" required>
+						<uni-easyinput ref="boxCodeInputRef" v-model="page.input.boxCode" placeholder="请扫描箱码"
+							@confirm="boxCodeConfirm"></uni-easyinput>
+					</uni-forms-item>
+					<uni-forms-item label="工单" name="orderCode" required>
+						<uni-easyinput ref="orderCodeInputRef" v-model="page.input.orderCode" placeholder="请扫描工单"
+							@confirm="orderCodeConfirm"></uni-easyinput>
+					</uni-forms-item>
+				</uni-forms>
 
-		<tui-form-button text="验证" @click="verifyClick"></tui-form-button>
+				<tui-form-button text="验证" @click="verifyClick"></tui-form-button>
+			</view>
+
+			<view class="pt-4 p-1 flex flex-1">
+				<scroll-view :scroll-y="true" class="list-container">
+					<view v-for="(i) in 30" class="p-2">
+						<view class="flex-row">
+							<tui-text text="工单号："></tui-text>
+							<tui-text text="123456789"></tui-text>
+						</view>
+					</view>
+				</scroll-view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -87,12 +102,16 @@
 
 <style lang="scss" scoped>
 	.sfcbox {
+		display: flex;
+		
 		background-color: #fff;
-
 		padding: 20rpx 20rpx 0 20rpx;
-
-		.mt-1 {
-			margin-top: 20rpx;
+		
+		.list-container {
+			display: flex;
+			flex: 1;
+			border: .5px solid #ddd;
+			background-color: #eee;
 		}
 	}
 </style>
