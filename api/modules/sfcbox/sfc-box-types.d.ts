@@ -1,5 +1,5 @@
 export type SfcBoxDataType = {
-	sfcboxCode: string,
-	orderCode: string
+	BoxCode: string,
+	WorkOrderCode: string
 }
 

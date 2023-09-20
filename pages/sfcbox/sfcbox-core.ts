@@ -7,7 +7,7 @@ export const rules = {
 		rules: [
 			{
 				required: true,
-				errorMessage: '请输入工号',
+				errorMessage: '请输入箱码',
 			}
 		]
 	},
@@ -15,7 +15,7 @@ export const rules = {
 		rules: [
 			{
 				required: true,
-				errorMessage: '请输入工号',
+				errorMessage: '请输入工单号',
 			}
 		]
 	}
@@ -58,9 +58,10 @@ export function init({
 	 * 点击验证按钮
 	 */
 	async function verifyClick() {
+		console.log('12222')
 		const { msg } = await sfcboxValidateScanAsync({
-						sfcboxCode: page.input.boxCode,
-						orderCode: page.input.orderCode
+						BoxCode: page.input.boxCode,
+						WorkOrderCode: page.input.orderCode
 					})
 					
 		uni.showModal({
