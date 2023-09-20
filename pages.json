@@ -1,6 +1,5 @@
 {
-	"pages": [
-		{
+	"pages": [{
 			"path": "pages/tabbar/home/home",
 			"style": {
 				"navigationBarTitleText": "工作台"
@@ -19,25 +18,6 @@
 			}
 		},
 		{
-			"path": "pages/sfcbox/main/index",
-			"style": {
-				"navigationBarTitleText": "箱码校验"
-			}
-		  },
-		  // {
-		// 	"path": "pages/sfcbox/main/index-box",
-		// 	"style": {
-		// 		"navigationBarTitleText": "单据收货",
-		// 		"app-plus": {
-		// 			"titleNView": {
-		// 				"buttons": [{
-		// 					"type": "menu"
-		// 				}]
-		// 			}
-		// 		}
-		// 	}
-		// },  		
-		{
 			"path": "pages/user/operate/password/password-operate",
 			"style": {
 				"navigationBarTitleText": "修改密码"
@@ -52,7 +32,13 @@
 		{
 			"path": "pages/user/operate/userinfo/userinfo-operate",
 			"style": {
-				"navigationBarTitleText": "修改密码"
+				"navigationBarTitleText": "资料编辑"
+			}
+		},
+		{
+			"path": "pages/sfcbox/sfcbox",
+			"style": {
+				"navigationBarTitleText": "箱码校验"
 			}
 		}
 	],
