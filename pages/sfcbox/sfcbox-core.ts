@@ -1,6 +1,11 @@
+import type { PdaListItem } from '@/components/pda/pda-list/pda-list-types'
+
 import { reactive } from "vue";
 
-import { sfcboxValidateScanAsync} from '@/api/modules/sfcbox/sfc-box'
+import clipboard from '@/components/common/tui-clipboard/tui-clipboard.js'
+import { sfcboxValidateScanAsync, sfcboxFuzzyPageAsync } from '@/api/modules/mes/sfcbox/sfc-box'
+
+import { debounce } from '@/utils/fn-utils'
 
 export const rules = {
 	boxCode: {
@@ -31,53 +36,129 @@ export function init({
 			boxCode : string
 			orderCode : string
 		},
-		list : {}
+		result : {
+			items : PdaListItem[],
+			data : any[]
+		},
+		timeout : {
+			orderCodeInput : any
+		}
 	}>({
 		input: {
 			boxCode: '',
 			orderCode: ''
 		},
-		list: {}
+		result: {
+			items: [
+				{
+					label: '工单号',
+					field: 'orderCode'
+				},
+				{
+					label: '数量',
+					field: 'qty'
+				},
+				{
+					label: '规模过大',
+					field: 'overScale'
+				},
+				{
+					label: '状态',
+					field: 'status'
+				}
+			],
+			data: []
+		},
+		timeout: {
+			orderCodeInput: null
+		}
 	});
-	
+
 	/**
-	 * 箱码确认
+	 * 分页查询处理器
 	 */
-	function boxCodeConfirm(){
-		orderCodeInputFocus()
+	async function getPageHandlerAsync() {
+		if (!page.input.orderCode) {
+			page.result.data = []
+
+			return
+		}
+
+		if (page.input.orderCode === '') {
+			page.result.data = []
+
+			return
+		}
+
+		try {
+			page.result.data = await sfcboxFuzzyPageAsync(page.input.orderCode)
+		} catch { }
 	}
-	
+
 	/**
-	 * 工单确认
+	 * 分页查询
 	 */
-	function orderCodeConfirm(){
-		boxCodeInputFocus()
+	function getPageAsync() {
+		page.timeout.orderCodeInput = debounce(getPageHandlerAsync, page.timeout.orderCodeInput, 300)()
 	}
-	
+
 	/**
 	 * 点击验证按钮
 	 */
-	async function verifyClick() {
-		const { msg } = await sfcboxValidateScanAsync({
-						BoxCode: page.input.boxCode,
-						WorkOrderCode: page.input.orderCode
-					})
-					
-		uni.showModal({
-			title: msg,
-			showCancel: false
+	async function verifyClickAsync() {
+		try {
+			const { msg } = await sfcboxValidateScanAsync({
+				BoxCode: page.input.boxCode,
+				WorkOrderCode: page.input.orderCode
+			})
+
+			uni.showModal({
+				title: msg,
+				showCancel: false,
+				success() {
+					boxCodeInputFocus()
+				}
+			})
+		} catch {
+			orderCodeInputFocus()
+		}
+	}
+
+	/**
+	 * 箱码确认
+	 */
+	function boxCodeConfirm() {
+		orderCodeInputFocus()
+	}
+
+	/**
+	 * 工单确认
+	 */
+	async function orderCodeConfirm() {
+		orderCodeInputFocus()
+	}
+
+	/**
+	 * 工单号复制
+	 * @param {Object} data
+	 */
+	function orderCodeCopy(data : any) {
+		page.input.orderCode = data.orderCode
+
+		clipboard.getClipboardData(page.input.orderCode, () => {
+			uni.showToast({
+				title: '工单号复制成功',
+				icon: 'none'
+			})
 		})
-		
-		// uni.showToast({
-		// 	title: '请求异常',
-		// 	icon: 'none'
-		// })
 	}
 
 	return {
 		page,
+		getPageAsync,
 		boxCodeConfirm,
 		orderCodeConfirm,
-		verifyClick
+		verifyClickAsync,
+		orderCodeCopy
 	}
 }

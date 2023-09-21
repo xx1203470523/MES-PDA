@@ -9,32 +9,21 @@
  * @param wait 延迟执行毫秒数
  * @param immediate true - 立即执行， false - 延迟执行
 */
-export function debounce(func : Function, timeout : any, wait = 1000, immediate = true) {
+export function debounce(func : Function, timeout : any, wait = 1000) {
 	return function () {
 		let context = this,
-			args = arguments
+			args = arguments,
+			_timeout = timeout
 
-		if (timeout) {
-			clearTimeout(timeout)
+		if (_timeout) {
+			clearTimeout(_timeout)
 		}
 
-		if (immediate) {
-			let callNow = !timeout
+		_timeout = setTimeout(async () => {
+			await func.apply(context, args)
+		}, wait)
 
-			timeout = setTimeout(() => {
-				timeout = null
-			}, wait)
-
-			if (callNow) {
-				func.apply(context, args)
-			}
-		} else {
-			timeout = setTimeout(() => {
-				func.apply(context, args)
-			}, wait)
-		}
-
-		return timeout
+		return _timeout
 	}
 }
 
@@ -45,7 +34,7 @@ export function debounce(func : Function, timeout : any, wait = 1000, immediate 
  * @param wait 延迟执行毫秒数
  * @param type 1 在时间段开始的时候触发 2 在时间段结束的时候触发
 */
-export function throttle(func : Function, timeout : any, wait = 500) {
+export function throttle(func : Function, timeout : any, wait = 1000) {
 	return function () {
 		let context = this
 		let args = arguments
@@ -54,8 +43,8 @@ export function throttle(func : Function, timeout : any, wait = 500) {
 			clearTimeout(timeout)
 		}
 
-		timeout = setTimeout(() => {
-			func.apply(context, args)
+		timeout = setTimeout(async () => {
+			await func.apply(context, args)
 		}, wait)
 
 		return timeout

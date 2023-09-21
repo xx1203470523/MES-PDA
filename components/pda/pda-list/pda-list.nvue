@@ -1,4 +1,4 @@
-<template>	
+<template>
 	<scroll-view :scroll-top="componentPage.scroll.top" scroll-y="true" class="pda-list-container"
 		:style="{'height': height}" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
 		<view class="pda-list-container-item" v-for="(i, index) in data" :key="index" @click="click(i)">
@@ -18,38 +18,36 @@
 					<uni-icons size="20" type="forward" color="#66600"></uni-icons>
 				</view>
 			</view>
-
 		</view>
 	</scroll-view>
 </template>
 
 <script lang="ts" name="received" setup>
 	import { reactive } from 'vue'
-	
+
 	import { fieldGet } from '@/utils/object-utils'
 
 	const props = defineProps(['items', 'data', 'height', 'arrowRight'])
 	const emits = defineEmits(['click', 'scroll', 'upper', 'lower'])
-	
+
 	const componentPage = reactive({
 		scroll: {
 			top: 0,
 			oldTop: 0
 		}
 	});
-	
+
 	function upper(e : any) {
 		emits('upper', e)
 	}
-	
+
 	function lower(e : any) {
 		emits('lower', e)
 	}
-	
+
 	function scroll(e : any) {
-		componentPage.scroll.oldTop = e.detail.scrollTop
-		// emits('scroll')
-	}	
+		componentPage.scroll.oldTop = e.detail.scrollTop		
+	}
 
 	function click(data : any) {
 		emits('click', data)
@@ -58,16 +56,13 @@
 
 <style lang="scss" scoped>
 	.pda-list-container {
-		padding: 12rpx 0;
+		flex: 1;
 
 		.pda-list-container-item {
+			padding-bottom: 32rpx;
+
 			display: flex;
 			justify-content: space-between;
-
-			border-bottom: 1px solid #eee;
-
-			// padding-top: 10rpx;
-			// padding-bottom: 20rpx;
 
 			position: relative;
 
@@ -84,8 +79,6 @@
 				align-items: center;
 				justify-content: space-between;
 
-				// padding: 10rpx 0;
-
 				.pda-list-container-item-row__body-content {
 					display: flex;
 					justify-content: center;
@@ -95,7 +88,7 @@
 						flex-direction: row;
 						align-items: center;
 
-						padding: 10rpx 0;
+						padding-bottom: 10rpx;
 
 						.sub-label {
 							color: #666;
@@ -106,6 +99,15 @@
 						}
 					}
 				}
+			}
+
+			&::after {
+				content: '';
+				bottom: 20rpx;
+				height: 1rpx;
+				width: 750rpx;
+				position: absolute;
+				background-color: #ddd;
 			}
 		}
 	}

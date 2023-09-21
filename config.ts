@@ -7,7 +7,7 @@ const appConfig = {
 	// wmsRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:11701/api' : 'http://10.10.79.12:9013/wms/api',
 
 	// mes远程地址
-	mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:11701/api' : 'http://10.10.79.12:9013/wms/api',
+	mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.9.2.59:11701/api' : 'http://10.10.79.12:9013/wms/api',
 
 	// 用户中心远程地址
 	userCenterRemoteUrl: process.env.NODE_ENV === 'development' ? '/userService' : 'http://10.10.79.12:9015/prod-api'
