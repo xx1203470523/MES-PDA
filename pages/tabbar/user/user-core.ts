@@ -6,8 +6,8 @@ import { delCache } from '@/utils/cache-utils'
 import { to, reLaunch } from '@/utils/route-utils'
 
 import { getUserInfoAsync } from '@/api/modules/user-center/user'
-import { getWarehouseListApiAsync, getDefaultWarehouseAsync } from '@/api/modules/wms/common/common-selector'
-import { saveWarehouseDataApi } from '@/api/modules/wms/config/config-user'
+// import { getWarehouseListApiAsync, getDefaultWarehouseAsync } from '@/api/modules/wms/common/common-selector'
+// import { saveWarehouseDataApi } from '@/api/modules/wms/config/config-user'
 
 import type { userInfoType } from '@/api/modules/user-center/user-types'
 
@@ -91,7 +91,7 @@ export function init() {
 	 */
 	async function reloadUserDefaultWarehouse() {
 		if (page.userInfo.user) {
-			page.warehouse.data = await getDefaultWarehouseAsync()
+			// page.warehouse.data = await getDefaultWarehouseAsync()
 		}
 	}
 
@@ -99,7 +99,7 @@ export function init() {
 	 * 打开仓库选择器
 	 */
 	async function openWarehouseSetting() {
-		page.warehouse.list = await getWarehouseListApiAsync()
+		// page.warehouse.list = await getWarehouseListApiAsync()
 
 		if (page.warehouse.data && page.warehouse.data.defaultWarehouseId) {
 			const _index = page.warehouse.list.findIndex(m => m.value == page.warehouse.data.defaultWarehouseId)
@@ -127,9 +127,9 @@ export function init() {
 			const { value } = options
 
 			try {
-				await saveWarehouseDataApi({
-					defaultWarehouseId: value
-				})
+				// await saveWarehouseDataApi({
+				// 	defaultWarehouseId: value
+				// })
 				
 				closeWarehouseSetting()
 				

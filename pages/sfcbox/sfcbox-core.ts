@@ -58,7 +58,6 @@ export function init({
 	 * 点击验证按钮
 	 */
 	async function verifyClick() {
-		console.log('12222')
 		const { msg } = await sfcboxValidateScanAsync({
 						BoxCode: page.input.boxCode,
 						WorkOrderCode: page.input.orderCode

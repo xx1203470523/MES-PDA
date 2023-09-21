@@ -44,13 +44,13 @@
 							<text class="text-sub-title text-white">
 								{{ page.receivingRecords }}
 							</text>
-							<text class="text-sub text-white mt-1">收货记录</text>
+							<text class="text-sub text-white mt-1">验证记录</text>
 						</view>
 						<view class="flex-1 flex flex-align-center flex-justify-center">
 							<text class="text-sub-title text-white">
 								{{ page.onShelvesRecords }}
 							</text>
-							<text class="text-sub text-white mt-1">上架记录</text>
+							<text class="text-sub text-white mt-1">操作记录</text>
 						</view>
 					</view>
 					<view class="divider"></view>
