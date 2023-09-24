@@ -1,7 +1,8 @@
 <template>
 	<scroll-view :scroll-top="componentPage.scroll.top" scroll-y="true" class="pda-list-container"
 		:style="{'height': height}" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
-		<view class="pda-list-container-item" v-for="(i, index) in data" :key="index" @click="click(i)">
+		<view class="pda-list-container-item" v-for="(i, index) in data" :key="index"
+			:class="{'pda-list-item-border': index < data.length - 1}" @click="click(i)">
 			<view class="pda-list-container-item-row__header">
 				<slot name="list-header" :row="i"></slot>
 			</view>
@@ -17,6 +18,7 @@
 				<view v-if="arrowRight">
 					<uni-icons size="20" type="forward" color="#66600"></uni-icons>
 				</view>
+				<slot name="right" :row="i"></slot>
 			</view>
 		</view>
 	</scroll-view>
@@ -46,7 +48,7 @@
 	}
 
 	function scroll(e : any) {
-		componentPage.scroll.oldTop = e.detail.scrollTop		
+		componentPage.scroll.oldTop = e.detail.scrollTop
 	}
 
 	function click(data : any) {
@@ -100,7 +102,9 @@
 					}
 				}
 			}
+		}
 
+		.pda-list-item-border {
 			&::after {
 				content: '';
 				bottom: 20rpx;

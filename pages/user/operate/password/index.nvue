@@ -1,0 +1,86 @@
+<template>
+	<view class="password-operate" :style="{height: pageHeight}">
+		<uni-forms ref="form" class="p-3 bg-white border-bottom" :rules="rules" :modelValue="page.input" :border="false"
+			:label-width="80">
+			<uni-forms-item label="工号:" required>
+				<view class="flex flex-justify-center">
+					<tui-text type="gray" :text="page.userinfo.id" :size="26"></tui-text>
+				</view>
+			</uni-forms-item>
+			<uni-forms-item label="旧密码" name="oldpassword" required>
+				<uni-easyinput ref="oldpassword" v-model="page.input.oldpassword" type="password" trim
+					placeholder="请输入旧密码"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="新密码" name="newpassword" required>
+				<uni-easyinput ref="newpassword" v-model="page.input.newpassword" type="password" trim
+					placeholder="请输入新的密码"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item label="确认密码" name="confirmpassword" required>
+				<uni-easyinput ref="confirmpassword" v-model="page.input.confirmpassword" type="password" trim
+					placeholder="请再次输入新的密码"></uni-easyinput>
+			</uni-forms-item>
+		</uni-forms>
+		<view class="flex flex-align-center mt-3">
+			<tui-form-button width="400rpx" height="80rpx" text="确认修改" @click="ConfirmAsync"
+				:size="28"></tui-form-button>
+		</view>
+		<view class="flex flex-align-center mt-3">
+			<tui-form-button width="400rpx" height="80rpx" text="取消" @click="btnCancel" :size="28"></tui-form-button>
+		</view>
+	</view>
+</template>
+
+<script lang="ts" name="password-operate" setup>
+	import { onLoad, onReady } from '@dcloudio/uni-app'
+	import { computed, ref, unref } from 'vue'
+	import { init } from './core'
+
+	const { page, rules, ConfirmAsync, btnCancel, OnInit } = init({ vaild })
+
+	const form = ref()
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight - 50
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 94
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(() => {
+		page.windowInfo = uni.getWindowInfo()
+	})
+
+	onReady(() => {
+		OnInit()
+	})
+
+
+
+	/**
+	 * 验证表单
+	 */
+	async function vaild() {
+		const _form = unref(form)
+		if (_form) {
+			try {
+				await _form.validate()
+				return true
+			} catch (err) {
+				return false
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.password-operate {
+		background-color: #fff;
+	}
+</style>

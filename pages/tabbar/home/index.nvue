@@ -1,0 +1,74 @@
+<template>
+	<view class="home" :style="{'min-height': pageHeight}">
+		<uni-section v-for="(item, index) in page.collapse.items" :title="item.title" :key="index" type="line">
+			<uni-grid :column="3" :showBorder="false" :highlight="true">
+				<uni-grid-item v-for="(gridItem, gridIndex) in item.items" :index="gridIndex" :key="gridIndex">
+					<view class="grid-item-box" @click="navTo(gridItem.url)">
+						<image v-if="gridItem.icon" :src="gridItem.icon" class="image" mode="aspectFill" lazy-load />
+						<text class="text mt-2">{{ gridItem.title }}</text>
+						<text v-if="gridItem.describe" class="text mt-1">（{{ gridItem.describe }})</text>
+					</view>
+				</uni-grid-item>
+			</uni-grid>
+		</uni-section>
+	</view>
+</template>
+
+<script lang="ts" name="tabbar-home" setup>
+	import { onLoad } from '@dcloudio/uni-app'
+	import { computed } from 'vue'
+	import { init } from './core'
+	import { getUserInfoAsync } from '@/api/modules/user-center/user'
+	import { autoUpdate } from '@/utils/version-utils'
+
+	const { page, navTo } = init()
+
+	const pageHeight = computed(() => {
+		let height = 0
+
+		//#ifdef APP
+		height = page.windowInfo.windowHeight - 50
+		// #endif
+
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 94
+		// #endif
+
+		return height + 'px'
+	})
+
+	onLoad(() => {
+		getUserInfoAsync()
+		page.windowInfo = uni.getWindowInfo()
+		//#ifdef APP
+		autoUpdate()
+		// #endif
+	})
+</script>
+
+<style lang="scss" scoped>
+	.home {
+		background-color: #fff;
+
+		.grid-item-box {
+			flex: 1;
+			/* #ifndef APP-NVUE */
+			display: flex;
+			/* #endif */
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 20rpx 0;
+
+			.text {
+				font-size: 24rpx;
+				// margin-top: 5rpx;
+			}
+
+			.image {
+				width: 100rpx;
+				height: 100rpx;
+			}
+		}
+	}
+</style>

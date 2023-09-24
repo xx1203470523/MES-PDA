@@ -124,12 +124,12 @@
 			//容器z-index
 			zIndex: {
 				type: Number,
-				default: 9997
+				default: 100
 			},
 			//mask z-index
 			maskZIndex: {
 				type: Number,
-				default: 9990
+				default: 99
 			}
 		},
 		data() {

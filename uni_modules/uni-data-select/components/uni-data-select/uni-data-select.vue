@@ -417,7 +417,8 @@
 
 	.uni-select__input-text {
 		// width: 280px;
-		width: 100%;
+		// width: 100%;
+		flex: 1;
 		color: $uni-main-color;
 		white-space: nowrap;
 		text-overflow: ellipsis;

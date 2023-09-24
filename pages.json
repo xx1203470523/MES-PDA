@@ -1,44 +1,56 @@
 {
 	"pages": [{
-			"path": "pages/tabbar/home/home",
+			"path": "pages/tabbar/home/index",
 			"style": {
 				"navigationBarTitleText": "工作台"
 			}
 		},
 		{
-			"path": "pages/tabbar/user/user",
+			"path": "pages/tabbar/user/index",
 			"style": {
 				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path": "pages/login/login",
+			"path": "pages/login/index",
 			"style": {
 				"navigationBarTitleText": "登录"
 			}
 		},
 		{
-			"path": "pages/user/operate/password/password-operate",
+			"path": "pages/user/operate/password/index",
 			"style": {
 				"navigationBarTitleText": "修改密码"
 			}
 		},
 		{
-			"path": "pages/user/version/version",
+			"path": "pages/user/version/index",
 			"style": {
 				"navigationBarTitleText": "版本更新"
 			}
 		},
 		{
-			"path": "pages/user/operate/userinfo/userinfo-operate",
+			"path": "pages/user/operate/userinfo/index",
 			"style": {
 				"navigationBarTitleText": "资料编辑"
 			}
 		},
 		{
-			"path": "pages/sfcbox/sfcbox",
+			"path": "pages/box-verify/index",
 			"style": {
 				"navigationBarTitleText": "箱码校验"
+			}
+		},
+		{
+			"path": "pages/repair/index",
+			"style": {
+				"navigationBarTitleText": "维修"
+			}
+		},
+		{
+			"path": "pages/resumption/index",
+			"style": {
+				"navigationBarTitleText": "复投"
 			}
 		}
 	],
@@ -60,13 +72,13 @@
 		"borderStyle": "black",
 		"backgroundColor": "#fff",
 		"list": [{
-				"pagePath": "pages/tabbar/home/home",
+				"pagePath": "pages/tabbar/home/index",
 				"iconPath": "static/imgs/tabbar/home.png",
 				"selectedIconPath": "static/imgs/tabbar/home-active.png",
 				"text": "工作台"
 			},
 			{
-				"pagePath": "pages/tabbar/user/user",
+				"pagePath": "pages/tabbar/user/index",
 				"iconPath": "static/imgs/tabbar/user.png",
 				"selectedIconPath": "static/imgs/tabbar/user-active.png",
 				"text": "我的"

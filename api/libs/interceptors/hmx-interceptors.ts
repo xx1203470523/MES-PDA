@@ -82,7 +82,7 @@ export function responseFail(error : any) {
 						success: ({ confirm }) => {
 							if (confirm) {
 								uni.navigateTo({
-									url: `/pages/login/login?redirect=${encodeURIComponent(currentPage.route)}`
+									url: `/pages/login/index?redirect=${encodeURIComponent(currentPage.route)}`
 								})
 							}
 						}

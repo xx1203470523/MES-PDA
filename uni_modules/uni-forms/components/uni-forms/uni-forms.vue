@@ -225,7 +225,7 @@
 			 * @param {Array} keepitem 保留不参与校验的字段
 			 * @param {type} callback 方法回调
 			 */
-			validate(keepitem, callback) {
+			validate(keepitem, callback) {				
 				return this.checkAll(this.formData, keepitem, callback);
 			},
 

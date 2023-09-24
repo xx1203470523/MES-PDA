@@ -1,4 +1,4 @@
-export type PdaListItem = {
+export type PdaListItemType = {
 	label: string,
 	field: string,
 	color?: string
