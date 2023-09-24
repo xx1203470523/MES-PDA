@@ -129,7 +129,8 @@ export function init({
 		page.windowInfo = uni.getWindowInfo()
 
 		uni.showLoading({
-			title: '页面初始化中...'
+			title: '页面初始化中...',
+			mask: true
 		})
 
 		await reloadProcProcedureSelected()

@@ -146,15 +146,25 @@ export function init({
 	 */
 	async function unbindSFCAsync() {
 		if (await formVaild()) {
-			uni.showLoading({
-				title: '解绑中...'
+			uni.showModal({
+				title: '操作警告',
+				content: '确认全部解绑吗？',
+				async success({ confirm }) {
+					if (confirm) {
+						uni.showLoading({
+							title: '全部解绑中...',
+							mask: true
+						})
+						try {
+							await unbindAsync({
+								sFC: page.input.code
+							})
+						} catch { }
+						uni.hideLoading()
+					}
+				}
 			})
-			try {
-				await unbindAsync({
-					sFC: page.input.code
-				})
-			} catch { }
-			uni.hideLoading()
+
 		}
 		codeInputFocus()
 	}
