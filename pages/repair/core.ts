@@ -29,7 +29,7 @@ export function init({
 					rules: [
 						{
 							required: true,
-							errorMessage: '请扫描新设备编码',
+							errorMessage: '请扫描新条码',
 						}
 					]
 				}

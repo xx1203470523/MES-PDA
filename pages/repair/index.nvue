@@ -45,10 +45,10 @@
 				<uni-forms-item label="条码" name="code" required>
 					<tui-text :text="page.input.code" :size="28" type="gray"></tui-text>
 				</uni-forms-item>
-				<uni-forms-item label="旧设备" name="bindSFC" required>
+				<uni-forms-item label="旧条码" name="bindSFC" required>
 					<tui-text :text="page.chose.detail.bindSFC" :size="28" type="gray"></tui-text>
 				</uni-forms-item>
-				<uni-forms-item label="新设备" name="newBindCode" required>
+				<uni-forms-item label="新条码" name="newBindCode" required>
 					<uni-easyinput ref="newBindCodeInputRef" v-model="page.input.newBindCode" trim
 						placeholder="扫描或输入"></uni-easyinput>
 				</uni-forms-item>
