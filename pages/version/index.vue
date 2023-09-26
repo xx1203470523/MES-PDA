@@ -1,6 +1,6 @@
 <template>
 	<view class="version" :style="{minHeight: pageHeight}">
-		<uni-card>
+		<uni-card :hide-actions="false">
 			<view>
 				<text>当前版本：{{ appStore.systemInfo.appVersion}}</text>
 			</view>
@@ -21,7 +21,7 @@
 			</template>
 		</uni-card>
 
-		<uni-card title="最新版本" :sub-title="`版本号：${page.result.info.versionName}`" :hide-actions="false">
+		<uni-card title="最新版本" :sub-title="`版本号：${page.result.info.versionName}`">
 			<u-parse className="version-content" :content="page.result.content || ''"></u-parse>
 		</uni-card>
 	</view>
