@@ -77,8 +77,8 @@
 		mounted() {
 			this.darwProgress();
 		},
-		computed:{
-			getActiveColor(){
+		computed: {
+			getActiveColor() {
 				return this.activeColor || (uni && uni.$tui && uni.$tui.color.primary) || '#5677fc'
 			}
 		},
@@ -101,7 +101,7 @@
 				setTimeout(() => {
 					this.$emit('activeend', {});
 				}, this.time)
-				this.percentage =percent;
+				this.percentage = percent;
 				this.translateX = (100 - percent) + '%';
 			}
 		}
@@ -111,6 +111,7 @@
 <style scoped>
 	.tui-progress__box {
 		width: 100%;
+		flex: 1;
 		display: flex;
 		align-items: center;
 	}

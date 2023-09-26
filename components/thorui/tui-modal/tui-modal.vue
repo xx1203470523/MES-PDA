@@ -202,7 +202,7 @@
 		opacity: 0;
 		visibility: hidden;
 		box-sizing: border-box;
-		transition: all 0.3s ease-in-out;
+		transition: opacity 0.3s ease-in-out;
 	}
 
 	.tui-modal-scale {

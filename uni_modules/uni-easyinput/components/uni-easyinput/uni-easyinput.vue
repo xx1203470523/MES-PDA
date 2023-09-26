@@ -14,8 +14,8 @@
 				class="uni-easyinput__content-input" :style="inputStyle" :name="name" :value="val"
 				:password="!showPassword && type === 'password'" :placeholder="placeholder"
 				:placeholderStyle="placeholderStyle" placeholder-class="uni-easyinput__placeholder-class"
-				:disabled="disabled" :maxlength="inputMaxlength" :auto-focus="autofocus" :focus="focused" :confirmType="confirmType"
-				@focus="_Focus" @blur="_Blur" @input="onInput" @confirm="onConfirm" />
+				:disabled="disabled" :maxlength="inputMaxlength" :auto-focus="autofocus" :focus="focused"
+				:confirmType="confirmType" @focus="_Focus" @blur="_Blur" @input="onInput" @confirm="onConfirm" />
 			<template v-if="type === 'password' && passwordIcon">
 				<!-- 开启密码时显示小眼睛 -->
 				<uni-icons v-if="isVal" class="content-clear-icon" :class="{ 'is-textarea-icon': type === 'textarea' }"
@@ -441,7 +441,7 @@
 				this.$emit("update:modelValue", "");
 				// 点击叉号触发
 				this.$emit("clear");
-				
+
 				this.toFocus()
 			},
 
@@ -469,44 +469,41 @@
 			/**
 			 * focus
 			 */
-			toFocus({ openKeyboard } = {}) {
+			toFocus() {
 				const that = this
 
 				// #ifdef H5
-
 				that.focused = false
 				setTimeout(() => {
 					that.focused = true
-					
-					if(openKeyboard){
-						// #ifndef APP-PLUS
-						uni.showKeyboard()
-						// #endif
-						// #ifdef APP-PLUS
-						plus.key.showSoftKeybord()
-						// #endif
-					}
 				}, 0)
 
 				// #endif
 
+				// #ifdef APP-VUE
+				that.focused = false
+				setTimeout(() => {
+					that.focused = true
+				}, 0)
+				// #endif
+
 				// #ifdef APP-NVUE
-				
+
 				setTimeout(() => {
 					if (that.type === 'textarea') {
 						that.$refs.textareaInput.focus()
 					} else {
 						that.$refs.simpleInput.focus()
 					}
-					
-					if(openKeyboard){
-						// #ifndef APP-PLUS
-						uni.showKeyboard()
-						// #endif
-						// #ifdef APP-PLUS
-						plus.key.showSoftKeybord()
-						// #endif
-					}
+
+					// if (openKeyboard) {
+					// 	// #ifndef APP-PLUS
+					// 	uni.showKeyboard()
+					// 	// #endif
+					// 	// #ifdef APP-PLUS
+					// 	plus.key.showSoftKeybord()
+					// 	// #endif
+					// }
 				}, 150)
 
 				// #endif

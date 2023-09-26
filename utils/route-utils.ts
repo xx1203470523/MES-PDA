@@ -39,7 +39,7 @@ export function to(url : string | HBuilderX.PageURIString) {
 /**
  * 路由跳转（兼容tabbar页）
  */
-export function redirectTo(url : string) {
+export function redirectTo(url : string | HBuilderX.PageURIString) {
 	uni.redirectTo({
 		url: url,
 		fail: ({ errMsg }) => {

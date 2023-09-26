@@ -1,37 +1,35 @@
 <template>
-	<view class="sfcbox" :style="{height: pageHeight}">
+	<view class="sfcbox" :style="{minHeight: pageHeight}">
 		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="toast"
 			:rules="page.formRules.pageRules" :modelValue="page.input">
-			<uni-forms-item label-width="150rpx" label="条码" name="code" required>
+			<uni-forms-item label-width="160rpx" label="条码" name="code" required>
 				<uni-easyinput ref="codeInputRef" v-model="page.input.code" trim placeholder="扫描或输入"
 					@confirm="codeConfirmAsync"></uni-easyinput>
 			</uni-forms-item>
-			<uni-forms-item label-width="150rpx" label="当前位置" name="nGLocationId" required>
+			<uni-forms-item label-width="160rpx" label="当前位置" name="nGLocationId" required>
 				<uni-data-select v-model="page.input.nGLocationId" :localdata="page.selected.options"
 					:clear="false"></uni-data-select>
 			</uni-forms-item>
-			<uni-forms-item label-width="150rpx" label="复投位置" name="repeatLocationId" required>
+			<uni-forms-item label-width="160rpx" label="复投位置" name="repeatLocationId" required>
 				<uni-data-select v-model="page.input.repeatLocationId" :localdata="page.selected.options"
 					:clear="false"></uni-data-select>
 			</uni-forms-item>
-			
-			<tui-button type="black" @click="repeatConfirmAsync">复投</tui-button>
-		</uni-forms>		
 
-		<uni-card class="flex-1">
-			<view class="flex-row flex-justify-between">
-				<view class="flex-row flex-1">
-					<view class="flex-row">
-						<tui-text text="绑定明细：" :size="28"></tui-text>
-						<tui-text :text="page.result.data.length" type="danger" :size="28"></tui-text>
+			<tui-button type="black" @click="repeatConfirmAsync">复投</tui-button>
+		</uni-forms>
+
+		<pda-list :items="page.result.items" :data="page.result.data">
+			<template #header>
+				<view class="flex-row flex-justify-between">
+					<view class="flex-row flex-1">
+						<view class="flex-row">
+							<tui-text text="绑定明细：" :size="28"></tui-text>
+							<tui-text :text="page.result.data.length" type="danger" :size="28"></tui-text>
+						</view>
 					</view>
 				</view>
-			</view>
-			<view class="mt-4">
-				<pda-list :items="page.result.items" :data="page.result.data">
-				</pda-list>
-			</view>
-		</uni-card>
+			</template>
+		</pda-list>
 	</view>
 </template>
 
@@ -113,5 +111,6 @@
 <style lang="scss" scoped>
 	.sfcbox {
 		display: flex;
+		flex-direction: column;
 	}
 </style>

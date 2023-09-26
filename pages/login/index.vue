@@ -1,5 +1,5 @@
 <template>
-	<view class="login" :style="{ 'height' : pageHeight + 'px' }">
+	<view class="login" :style="{ 'height' : pageHeight }">
 		<view class="flex-row flex-align-center flex-justify-center">
 			<image class="logo" src="../../static/imgs/login/logo.png" mode="heightFix"></image>
 		</view>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" name="login" setup>
-	import { ref, unref } from 'vue'
+	import { ref, computed, unref } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
 	import { init, rules } from './core';
 
@@ -41,7 +41,21 @@
 		}
 	}
 
-	const { page, pageHeight, loginHandle } = init({ vaild });
+	const { page, loginHandle } = init({ vaild });
+	
+	const pageHeight = computed(() => {
+		let height = 0
+	
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+	
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+	
+		return height + 'px'
+	})
 
 	onLoad((opt) => {
 		page.windowInfo = uni.getWindowInfo()
@@ -54,6 +68,7 @@
 <style lang="scss" scoped>
 	.login {
 		display: flex;
+		flex-direction: column;
 		background-color: #fff;
 
 		.logo {

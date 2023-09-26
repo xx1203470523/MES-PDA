@@ -254,18 +254,18 @@
 		align-items: center;
 		// padding: 15px;
 		cursor: pointer;
-		width: 100%;
+		display: flex;
 		flex: 1;
 		box-sizing: border-box;
 	}
 
 	.uni-stat-box {
-		width: 100%;
+		display: flex;
 		flex: 1;
 	}
 
 	.uni-stat__actived {
-		width: 100%;
+		display: flex;
 		flex: 1;
 		// outline: 1px solid #2979ff;
 	}
@@ -274,7 +274,10 @@
 		font-size: 14px;
 		font-weight: bold;
 		color: $uni-base-color;
+		/* #ifdef H5 */
 		margin: auto 0;
+		/* #endif */
+		// margin: auto 0;
 		margin-right: 5px;
 	}
 
@@ -408,7 +411,9 @@
 	}
 
 	.uni-popper__arrow::after {
+		/* #ifdef H5 */
 		content: " ";
+		/* #endif */
 		top: 1px;
 		margin-left: -6px;
 		border-top-width: 0;

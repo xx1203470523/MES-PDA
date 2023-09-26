@@ -1,5 +1,5 @@
 <template>
-	<view class="sfcbox" :style="{height: pageHeight}">
+	<view class="sfcbox" :style="{minHeight: pageHeight}">
 		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="toast"
 			:rules="page.formRules.pageRules" :modelValue="page.input">
 			<uni-forms-item label="条码" name="code" required>
@@ -12,32 +12,32 @@
 			</uni-forms-item>
 		</uni-forms>
 
-		<uni-card class="flex-1">
-			<view class="flex-row flex-justify-between">
-				<view class="flex-row flex-1">
-					<view class="flex-row">
-						<tui-text text="绑定明细：" :size="28"></tui-text>
-						<tui-text :text="page.result.data.length" type="danger" :size="28"></tui-text>
-					</view>
-					<view class="ml-4 flex-row">
-						<tui-text text="已绑定：" :size="28"></tui-text>
-						<tui-text :text="page.result.isBindCount" type="danger" :size="28"></tui-text>
-					</view>
-				</view>
-				<view>
-					<tui-text text="全部解绑" :size="28" type="primary" @click="unbindSFCAsync"></tui-text>
-				</view>
-			</view>
-			<view class="mt-4">
-				<pda-list :items="page.result.items" :data="page.result.data">
-					<template #right="{row}">
-						<view v-if="row.status === 1">
-							<tui-text text="解绑" :size="28" type="primary" @click="switchBindModalOpen(row)"></tui-text>
+		<pda-list :items="page.result.items" :data="page.result.data">
+			<template #header>
+				<view class="flex-row flex-justify-between">
+					<view class="flex-row flex-1">
+						<view class="flex-row">
+							<tui-text text="绑定明细：" :size="28"></tui-text>
+							<tui-text :text="page.result.data.length" type="danger" :size="28"></tui-text>
 						</view>
-					</template>
-				</pda-list>
-			</view>
-		</uni-card>
+						<view class="ml-4 flex-row">
+							<tui-text text="已绑定：" :size="28"></tui-text>
+							<tui-text :text="page.result.isBindCount" type="danger" :size="28"></tui-text>
+						</view>
+					</view>
+					<view>
+						<tui-text text="全部解绑" :size="28" type="primary" @click="unbindSFCAsync"></tui-text>
+					</view>
+				</view>
+			</template>
+			<template #right="{row}">
+				<view v-if="row.status === 1">
+					<tui-text text="解绑" :size="28" type="primary" @click="switchBindModalOpen(row)"></tui-text>
+				</view>
+			</template>
+		</pda-list>
+
+
 
 		<tui-modal padding="20rpx" radius="0" :show="page.modal.switchBind.show" @cancel="switchBindModalClose" custom>
 			<uni-forms ref="switchBindFormRef" class="p-2 bg-white border-bottom" errShowType="toast"
@@ -55,7 +55,8 @@
 			</uni-forms>
 
 			<view class="mt-1">
-				<tui-button type="black" :loading="page.modal.switchBind.isTasking" @click="switchBindModalConfirm">确认换绑</tui-button>
+				<tui-button type="black" :loading="page.modal.switchBind.isTasking"
+					@click="switchBindModalConfirm">确认换绑</tui-button>
 			</view>
 		</tui-modal>
 	</view>
@@ -168,5 +169,6 @@
 <style lang="scss" scoped>
 	.sfcbox {
 		display: flex;
+		flex-direction: column;
 	}
 </style>

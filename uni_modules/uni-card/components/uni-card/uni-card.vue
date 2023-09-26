@@ -29,7 +29,7 @@
 		<view class="uni-card__content" :style="{padding:padding}" @click="onClick('content')">
 			<slot></slot>
 		</view>
-		<view class="uni-card__actions" @click="onClick('actions')">
+		<view v-if="!hideActions" class="uni-card__actions" @click="onClick('actions')">
 			<slot name="actions"></slot>
 		</view>
 	</view>
@@ -111,6 +111,10 @@
 			backgroundColor: {
 				type: String,
 				default: '#fff'
+			},
+			hideActions: {
+				type: Boolean,
+				default: true
 			}
 		},
 		methods: {
@@ -145,6 +149,7 @@
 		font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
 
 		display: flex;
+		flex-direction: column;
 
 		.uni-card__cover {
 			position: relative;
@@ -232,11 +237,16 @@
 			font-size: 14px;
 			color: $uni-card-content-color;
 			line-height: 22px;
-			
+
+			display: flex;
+			flex-direction: column;
 			flex: 1;
 		}
 
 		.uni-card__actions {
+			padding: 20rpx;
+
+			border-top: 1px solid #eee;
 			font-size: 12px;
 		}
 	}

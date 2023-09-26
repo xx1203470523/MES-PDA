@@ -19,7 +19,7 @@
 	import { computed } from 'vue'
 	import { init } from './core'
 	import { getUserInfoAsync } from '@/api/modules/user-center/user'
-	import { autoUpdate } from '@/utils/version-utils'
+	// import { autoUpdate } from '@/utils/version-utils'
 
 	const { page, navTo } = init()
 
@@ -27,11 +27,11 @@
 		let height = 0
 
 		//#ifdef APP
-		height = page.windowInfo.windowHeight - 50
+		height = page.windowInfo.windowHeight
 		// #endif
 
 		// #ifndef APP
-		height = page.windowInfo.windowHeight - 94
+		height = page.windowInfo.windowHeight - 44
 		// #endif
 
 		return height + 'px'
@@ -40,9 +40,9 @@
 	onLoad(() => {
 		getUserInfoAsync()
 		page.windowInfo = uni.getWindowInfo()
-		//#ifdef APP
-		autoUpdate()
-		// #endif
+		// //#ifdef APP
+		// autoUpdate()
+		// // #endif
 	})
 </script>
 

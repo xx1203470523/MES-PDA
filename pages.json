@@ -18,19 +18,19 @@
 			}
 		},
 		{
-			"path": "pages/user/operate/password/index",
+			"path": "pages/user/password/index",
 			"style": {
 				"navigationBarTitleText": "修改密码"
 			}
 		},
 		{
-			"path": "pages/user/version/index",
+			"path": "pages/version/index",
 			"style": {
 				"navigationBarTitleText": "版本更新"
 			}
 		},
 		{
-			"path": "pages/user/operate/userinfo/index",
+			"path": "pages/user/userinfo/index",
 			"style": {
 				"navigationBarTitleText": "资料编辑"
 			}
@@ -81,7 +81,7 @@
 				"pagePath": "pages/tabbar/user/index",
 				"iconPath": "static/imgs/tabbar/user.png",
 				"selectedIconPath": "static/imgs/tabbar/user-active.png",
-				"text": "我的"
+				"text": "个人中心"
 			}
 		]
 	}

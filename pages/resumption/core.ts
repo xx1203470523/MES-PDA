@@ -3,7 +3,7 @@ import type { PageType } from './types'
 import { reactive } from "vue";
 
 import { listAsync, repeatManuSFCAsync } from '@/api/modules/mes/manuSFCBind/index'
-import { pageAsync } from '@/api/modules/mes/procProcedure/index'
+import { listAsync as procProcedureListAsync } from '@/api/modules/mes/procProcedure/index'
 
 
 export function init({
@@ -63,17 +63,16 @@ export function init({
 	 * 条码确认
 	 */
 	async function codeConfirmAsync() {
-		if (await formVaild()) {
-			try {
-				const { data, nGLocationId } = await listAsync({
-					sFC: page.input.code
-				})
+		try {
+			const { data, nGLocationId } = await listAsync({
+				sFC: page.input.code
+			})
 
 
-				page.result.data = data
-				page.input.nGLocationId = nGLocationId
-			} catch { }
-		}
+			page.result.data = data
+			page.input.nGLocationId = nGLocationId
+		} catch { }
+		
 		codeInputFocus()
 	}
 
@@ -108,10 +107,7 @@ export function init({
 	 */
 	async function reloadProcProcedureSelected() {
 		try {
-			const { data } = await pageAsync({
-				pageIndex: 1,
-				pageSize: 10000
-			})
+			const data = await procProcedureListAsync()
 
 			page.selected.options = data.map(m => {
 				return {

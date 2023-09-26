@@ -1,4 +1,4 @@
-import type { HomeType } from './home-types';
+import type { HomeType } from './types';
 
 import { reactive } from "vue";
 

@@ -10,16 +10,10 @@
 
 	export default {
 		onLaunch: function() {
-			console.warn('当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！')
-			console.log('App Launch')
-
 			this.init()
-			
+
 			// #ifdef APP-PLUS
-
-			// 初始化应用
 			this.initApp()
-
 			// #endif
 		},
 		onShow: function() {
@@ -29,22 +23,21 @@
 			console.log('App Hide')
 		},
 		methods: {
-			init() {
+			loginRememberHandle() {
 				const _loginRemember = getCache('login-remember')
 				if (_loginRemember && _loginRemember.data) {} else {
 					delCache('login-remember')
 					delCache('token')
 				}
 			},
+			init() {
+				const appStore = useAppStore()
+				appStore.loadSystemInfo()
+				
+				this.loginRememberHandle()
+			},
 			initApp() {
-				
 				plus.screen.lockOrientation('portrait-primary')
-				
-				plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
-					//把版本信息存进 Store app.ts			
-				const appStore = useAppStore()				
-				appStore.setversionCode(wgtinfo.versionCode)
-				})
 			}
 		}
 	}

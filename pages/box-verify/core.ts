@@ -1,4 +1,4 @@
-import type { PdaListItemType } from '@/components/pda/pda-list/pda-list-types'
+import type { PageType } from './types'
 
 import { reactive } from "vue";
 
@@ -12,21 +12,12 @@ export function init({
 	boxCodeInputFocus,
 	orderCodeInputFocus
 }) {
-	const page = reactive<{
-		windowInfo ?: UniNamespace.GetWindowInfoResult,
-		input : {
-			boxCode : string
-			orderCode : string
+	const page = reactive<PageType>({
+		element: {
+			list: {
+				height: 0
+			}
 		},
-		result : {
-			items : PdaListItemType[],
-			data : any[]
-		},
-		timeout : {
-			orderCodeInput : any
-		},
-		rules : any
-	}>({
 		input: {
 			boxCode: '',
 			orderCode: ''
@@ -73,7 +64,7 @@ export function init({
 				]
 			}
 		}
-	});
+	})
 
 	/**
 	 * 分页查询处理器
@@ -121,7 +112,7 @@ export function init({
 				}
 			})
 		} catch {
-			orderCodeInputFocus()
+			boxCodeInputFocus()
 		}
 	}
 

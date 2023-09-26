@@ -1,3 +1,5 @@
+import type { userInfoType } from '@/api/modules/user-center/user-types'
+
 import { computed, reactive } from "vue";
 
 import { useUserStore } from '@/store/user'
@@ -7,8 +9,6 @@ import { to, reLaunch } from '@/utils/route-utils'
 
 import { getUserInfoAsync } from '@/api/modules/user-center/user'
 
-import type { userInfoType } from '@/api/modules/user-center/user-types'
-
 export function init() {
 	const page = reactive<{
 		windowInfo ?: UniNamespace.GetWindowInfoResult,
@@ -17,8 +17,8 @@ export function init() {
 			show : boolean
 			list : Array<any>
 			data ?: {
-				defaultWarehouseId: string
-				warehouseName: string
+				defaultWarehouseId : string
+				warehouseName : string
 			}
 		}
 		receivingRecords : number,
@@ -32,12 +32,7 @@ export function init() {
 		receivingRecords: 3842,
 		onShelvesRecords: 0
 	})
-
-	/**
-	 * 页面高度
-	 */
-	const pageHeight = computed(() => page.windowInfo.windowHeight - 50)
-
+	
 	/**
 	 * 重载用户信息
 	 */
@@ -74,81 +69,30 @@ export function init() {
 	 * 到修改密码
 	 */
 	function toUpdatePassword() {
-		to('/pages/user/operate/password/index')
+		to('/pages/user/password/index')
 	}
 
 	/**
 	 * 到更新用户信息
 	 */
 	function toUpdateUserInfo() {
-		to('/pages/user/operate/userinfo/index')
+		to('/pages/user/userinfo/index')
 	}
-
+	
 	/**
-	 * 重新加载默认仓库
+	 * 到版本更新
 	 */
-	async function reloadUserDefaultWarehouse() {
-		if (page.userInfo.user) {
-			// page.warehouse.data = await getDefaultWarehouseAsync()
-		}
+	function toUpdateVersion(){
+		to('/pages/version/index')
 	}
-
-	/**
-	 * 打开仓库选择器
-	 */
-	async function openWarehouseSetting() {
-		// page.warehouse.list = await getWarehouseListApiAsync()
-
-		if (page.warehouse.data && page.warehouse.data.defaultWarehouseId) {
-			const _index = page.warehouse.list.findIndex(m => m.value == page.warehouse.data.defaultWarehouseId)
-			if (_index > -1) {
-				page.warehouse.list[_index].checked = true
-			}
-		}
-
-		page.warehouse.show = true
-	}
-
-	/**
-	 * 关闭仓库选择器
-	 */
-	function closeWarehouseSetting() {
-		page.warehouse.show = false
-		page.warehouse.list = []
-	}
-
-	/**
-	 * 保存仓库配置
-	 */
-	async function saveWarehouseSetting({ options }) {
-		if (options && options.value) {
-			const { value } = options
-
-			try {			
-				closeWarehouseSetting()
-				
-				await reloadUserDefaultWarehouse()
-
-				uni.showToast({
-					icon: 'success',
-					title: '设置成功'
-				})
-			} catch { }
-		}
-	}
-
 
 	return {
 		page,
-		pageHeight,
 		loginOut,
 		reloadUserInfoAsync,
 		toVersionUpdate,
 		toUpdatePassword,
 		toUpdateUserInfo,
-		reloadUserDefaultWarehouse,
-		openWarehouseSetting,
-		closeWarehouseSetting,
-		saveWarehouseSetting
+		toUpdateVersion
 	}
 }

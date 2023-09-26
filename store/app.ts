@@ -1,26 +1,29 @@
 import { defineStore } from 'pinia'
 
+import { versionGetAsync } from '@/api/modules/user-center/version'
+import { versionOutputType } from '@/api/modules/user-center/version-types'
+
 export const useAppStore = defineStore('app', {
-	state: () => ({
-		version: {
-			code: '',
-			hasNewVersion: false
-		}
-	}),
-	actions: {
-		setHasNewVersion(hasNewVersion : boolean) {			
-			this.version.hasNewVersion = hasNewVersion
-		},
-		setversionCode(code: string){
-			this.version.code = code
+	state: () : {
+		systemInfo : UniNamespace.GetSystemInfoResult,
+		newVersion : versionOutputType
+	} => {
+		return {
+			systemInfo: null,
+			newVersion: null
 		}
 	},
-	getters: {
-		getVersion({ version }) {
-			return version.hasNewVersion
+	getters: {},
+	actions: {
+		loadSystemInfo() {
+			this.systemInfo = uni.getSystemInfoSync()
 		},
-		getVersionCode({ version }) {
-			return version.code
+		async versionCheckAsync() {
+			if (!this.systemInfo) {
+				this.loadSystemInfo()
+			}
+			
+			this.newVersion = await versionGetAsync({ versionCode: Number(this.systemInfo.appVersionCode) })
 		}
 	}
 })

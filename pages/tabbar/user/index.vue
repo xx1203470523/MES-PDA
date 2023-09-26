@@ -1,59 +1,24 @@
 <template>
-	<view class="user" :style="{'min-height' : pageHeight + 'px'}">
-		<pda-nav title="个人中心">
-		</pda-nav>
+	<view class="user" :style="{'min-height' : pageHeight}">
+		<tui-status-bar></tui-status-bar>
 
 		<view class="header">
+			<view class="flex">
+				<text class="user-name">{{ page.userInfo.user?.userName }}</text>
+				<text class="text-sub mt-2">Thanks for your work</text>
+				<view class="mt-2">
+					<text class="text-sub">当前版本 {{ appStore.systemInfo.appVersion }}</text>
+				</view>
+				<view class="mt-1" v-if="isHasNewVersion">
+					<tui-tag plain>有新版本</tui-tag>					
+				</view>
+			</view>
+
 			<view class="custom-avatar">
 				<image class="img" :src="page.userInfo.user?.avatar || '/static/imgs/mine/default-avatar.png'"
 					mode="widthFix"></image>
 			</view>
-
-			<view class="ml-2 flex">
-				<text class="text-sub-title">{{ page.userInfo.user?.userName }}</text>
-				<view class="flex-row mt-1">
-					<uni-icons type="phone"></uni-icons>
-					<text class="text-sub ml-1">{{ page.userInfo.user?.phonenumber || '未补充电话号码' }} </text>
-				</view>
-			</view>
-
-			<!-- <view class="flex-1 flex-row flex-justify-end">
-				<uni-icons type="right"></uni-icons>
-			</view> -->
 		</view>
-
-		<!-- <view class="banner">
-			<uni-card class="banner-container" background-color="#5085FD" margin="0" padding="40rpx 0">
-				<view class="flex flex-1">
-					<view class="flex-row flex-align-center">
-						<uni-icons type="fire-filled" color="#fff" size="36"></uni-icons>
-						<text class="text-white ml-1">数据统计</text>
-					</view>
-					<view class="flex-row flex-justify-between mt-4">
-						<view class="flex-1 flex flex-align-center flex-justify-center">
-							<text class="text-sub-title text-white">
-								{{ page.receivingRecords }}
-							</text>
-							<text class="text-sub text-white mt-1">验证记录</text>
-						</view>
-						<view class="flex-1 flex flex-align-center flex-justify-center">
-							<text class="text-sub-title text-white">
-								{{ page.onShelvesRecords }}
-							</text>
-							<text class="text-sub text-white mt-1">操作记录</text>
-						</view>
-					</view>
-					<view class="divider"></view>
-					<view class="flex mt-2">
-						<tui-text type="white" text="感谢您的付出！"></tui-text>
-					</view>
-				</view>
-			</uni-card>
-
-			<view class="banner-decoration">
-				<image class="decoration-image" src="../../../static/imgs/mine/bg.png" mode="widthFix"></image>
-			</view>
-		</view> -->
 
 		<uni-grid class="mt-2" :column="4" :showBorder="false">
 			<uni-grid-item>
@@ -64,21 +29,21 @@
 					</view>
 				</view>
 			</uni-grid-item>
-			<!-- <uni-grid-item>
-				<view class="flex flex-justify-center flex-align-center p-2" @click="toVersionUpdate">
-					<image class="grid-image" src="../../../static/imgs/mine/update-version.png" mode="aspectFill">
-					</image>
-					<view class="mt-2">
-						<tui-text text="版本更新"></tui-text>
-					</view>
-				</view>
-			</uni-grid-item> -->
 			<uni-grid-item>
 				<view class="flex flex-justify-center flex-align-center p-2" @click="toUpdatePassword">
 					<image class="grid-image" src="../../../static/imgs/mine/edit-password.png" mode="aspectFill">
 					</image>
 					<view class="mt-2">
 						<tui-text text="修改密码"></tui-text>
+					</view>
+				</view>
+			</uni-grid-item>
+			<uni-grid-item>
+				<view class="flex flex-justify-center flex-align-center p-2" @click="toUpdateVersion">
+					<image class="grid-image" src="../../../static/imgs/mine/update-version.png" mode="aspectFill">
+					</image>
+					<view class="mt-2">
+						<tui-text text="版本更新"></tui-text>
 					</view>
 				</view>
 			</uni-grid-item>
@@ -91,30 +56,56 @@
 				</view>
 			</uni-grid-item>
 		</uni-grid>
-
-		<tui-select title="请选择默认仓库" :z-index="999" v-model="page.warehouse.data" :list="page.warehouse.list"
-			:show="page.warehouse.show" @confirm="saveWarehouseSetting" @close="closeWarehouseSetting"></tui-select>
 	</view>
 </template>
 
 <script setup name="tabbar-user" lang="ts">
 	import { onLoad, onShow } from '@dcloudio/uni-app'
+	import { computed } from 'vue'
 
 	import { init } from './core'
 
+	import { useAppStore } from '@/store/app'
+
+	const appStore = useAppStore()
+
 	const {
 		page,
-		pageHeight,
 		reloadUserInfoAsync,
-		loginOut,
-		toVersionUpdate,
-		reloadUserDefaultWarehouse,
 		toUpdatePassword,
 		toUpdateUserInfo,
-		// openWarehouseSetting,
-		closeWarehouseSetting,
-		saveWarehouseSetting
+		toUpdateVersion,
+		loginOut
 	} = init()
+
+	const isHasNewVersion = computed(() => {
+		if (!appStore.newVersion) {
+			return false
+		}
+		
+		if(appStore.newVersion.versionCode > Number(appStore.systemInfo.appVersionCode)){
+			return true
+		}else{
+			return false
+		}
+	})
+	
+	/**
+	 * 动态计算页面高度
+	 */
+	const pageHeight = computed(() => {
+		let height = 0
+	
+		//#ifdef APP
+		height = page.windowInfo.windowHeight
+		// #endif
+	
+		// #ifndef APP
+		height = page.windowInfo.windowHeight - 44
+		// #endif
+	
+		return height + 'px'
+	})
 
 	onLoad(() => {
 		page.windowInfo = uni.getWindowInfo()
@@ -122,16 +113,23 @@
 
 	onShow(async () => {
 		await reloadUserInfoAsync()
-		await reloadUserDefaultWarehouse()
+		await appStore.versionCheckAsync()
 	})
 </script>
 
 <style lang="scss" scoped>
+	.custom-button {
+		width: 600rpx;
+
+		border-radius: 60rpx;
+
+		background-color: $uni-primary;
+		color: #fff;
+	}
+
+
 	.user {
 		position: relative;
-
-		display: flex;
-		flex-direction: column;
 		background-color: #fff;
 
 		.nav-left {
@@ -150,10 +148,21 @@
 			background-color: #f5f5f5;
 
 			display: flex;
-			align-items: center;
 			flex-direction: row;
 
-			padding: 40rpx 20rpx;
+			padding: 40rpx 40rpx;
+
+			.user-name {
+				font-size: 48rpx;
+				font-weight: 700;
+
+				width: 515rpx;
+				color: #152338;
+
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 		}
 
 		.banner {

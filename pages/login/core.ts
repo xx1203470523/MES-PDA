@@ -89,7 +89,7 @@ export function init({ vaild }) {
 			if (page.redirect) {
 				redirectTo(`/${page.redirect}`)
 			} else {
-				redirectTo('/pages/tabbar/user/user')
+				redirectTo('/pages/tabbar/user/index')
 			}
 		} catch {
 
@@ -100,7 +100,6 @@ export function init({ vaild }) {
 
 	return {
 		page,
-		pageHeight,
 		loginHandle
 	};
 }

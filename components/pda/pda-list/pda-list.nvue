@@ -1,103 +1,169 @@
 <template>
-	<scroll-view :scroll-top="componentPage.scroll.top" scroll-y="true" class="pda-list-container"
-		:style="{'height': height}" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
-		<view class="pda-list-container-item" v-for="(i, index) in data" :key="index"
-			:class="{'pda-list-item-border': index < data.length - 1}" @click="click(i)">
-			<view class="pda-list-container-item-row__header">
-				<slot name="list-header" :row="i"></slot>
+	<uni-card class="flex-1" padding="0">
+		<view class="pda-list-container">
+			<view class="pda-list-container-header">
+				<slot name="header"></slot>
 			</view>
-			<view class="pda-list-container-item-row__body">
-				<view class="pda-list-container-item-row__body-content">
-					<view v-for="(item, itemIndex) in items" :key="itemIndex">
-						<view class="pda-list-container-item-row__body-item">
-							<text class="sub-label">{{ item.label }}：</text>
-							<text class="sub-value">{{ fieldGet(i, item.field) || '' }}</text>
+			<view class="pda-list-container-body">
+				<scroll-view class="pda-list-container-body__content" :scroll-top="componentPage.scroll.top" scroll-y
+					@scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
+					:style="{  height: componentPage.scroll.height }">
+					<view class="pda-list-container-item" v-for="(i, index) in data" :key="index" @click="click(i)">
+						<view class="pda-list-container-item-row__header">
+							<slot name="list-header" :row="i"></slot>
+						</view>
+						<view class="pda-list-container-item-row__body">
+							<view class="pda-list-container-item-row__body-content">
+								<view v-for="(item, itemIndex) in items" :key="itemIndex">
+									<view class="pda-list-container-item-row__body-item">
+										<text class="sub-label">{{ item.label }}：</text>
+										<text class="sub-value">{{ fieldGet(i, item.field) || '' }}</text>
+									</view>
+								</view>
+							</view>
+							<view v-if="arrowRight">
+								<uni-icons size="20" type="forward" color="#66600"></uni-icons>
+							</view>
+							<slot name="right" :row="i"></slot>
+						</view>
+						<view v-if="index < data.length - 1" class="pda-list-item-border">
+
 						</view>
 					</view>
-				</view>
-				<view v-if="arrowRight">
-					<uni-icons size="20" type="forward" color="#66600"></uni-icons>
-				</view>
-				<slot name="right" :row="i"></slot>
+				</scroll-view>
 			</view>
 		</view>
-	</scroll-view>
+	</uni-card>
+
 </template>
 
 <script lang="ts" name="received" setup>
-	import { reactive } from 'vue'
+	import { reactive, onMounted, nextTick } from 'vue'
 
 	import { fieldGet } from '@/utils/object-utils'
 
 	const props = defineProps(['items', 'data', 'height', 'arrowRight'])
+
 	const emits = defineEmits(['click', 'scroll', 'upper', 'lower'])
 
 	const componentPage = reactive({
 		scroll: {
+			height: '0 rpx',
 			top: 0,
 			oldTop: 0
 		}
 	});
 
+	/**
+	 * 滚动到顶部事件
+	 */
 	function upper(e : any) {
 		emits('upper', e)
 	}
 
+	/**
+	 * 滚动到底部事件
+	 */
 	function lower(e : any) {
 		emits('lower', e)
 	}
 
+	/**
+	 * 滚动事件
+	 */
 	function scroll(e : any) {
 		componentPage.scroll.oldTop = e.detail.scrollTop
 	}
 
+	/**
+	 * 点击事件
+	 */
 	function click(data : any) {
 		emits('click', data)
 	}
+
+	/**
+	 * 初始化元素
+	 */
+	async function initElement() {
+		await nextTick()
+
+		// #ifndef APP-NVUE
+		uni.createSelectorQuery().in(this).select('.pda-list-container-body').boundingClientRect((node : UniNamespace.NodeInfo) => {
+			componentPage.scroll.height = node.height - 20 + 'px'
+		}).exec()
+		// #endif
+
+		// #ifdef APP-NVUE
+		componentPage.scroll.height = '700rpx'
+		// #endif
+	}
+
+	onMounted(() => {
+		initElement()
+	})
 </script>
 
 <style lang="scss" scoped>
 	.pda-list-container {
+		display: flex;
+		flex-direction: column;
 		flex: 1;
 
-		.pda-list-container-item {
-			padding-bottom: 32rpx;
+		.pda-list-container-header {
+			padding-top: 20rpx;
+		}
 
+		.pda-list-container-body {
+			padding-top: 20rpx;
+			
 			display: flex;
-			justify-content: space-between;
+			flex-direction: column;
+			flex: 1;
 
-			position: relative;
+			.pda-list-container-body__content {
+				.pda-list-container-item {
+					padding-bottom: 20rpx;
 
-			.pda-list-container-item-row__header {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			.pda-list-container-item-row__body {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-
-				.pda-list-container-item-row__body-content {
 					display: flex;
-					justify-content: center;
+					flex-direction: column;
+					justify-content: space-between;
 
-					.pda-list-container-item-row__body-item {
+					position: relative;
+
+					.pda-list-container-item-row__header {
 						display: flex;
 						flex-direction: row;
 						align-items: center;
+						justify-content: space-between;
+					}
 
-						padding-bottom: 10rpx;
+					.pda-list-container-item-row__body {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						justify-content: space-between;
 
-						.sub-label {
-							color: #666;
-						}
+						.pda-list-container-item-row__body-content {
+							display: flex;
+							flex-direction: column;
+							justify-content: center;
 
-						.sub-value {
-							color: #333;
+							.pda-list-container-item-row__body-item {
+								display: flex;
+								flex-direction: row;
+								align-items: center;
+
+								padding-bottom: 10rpx;
+
+								.sub-label {
+									color: #666;
+								}
+
+								.sub-value {
+									color: #333;
+								}
+							}
 						}
 					}
 				}
@@ -105,14 +171,11 @@
 		}
 
 		.pda-list-item-border {
-			&::after {
-				content: '';
-				bottom: 20rpx;
-				height: 1rpx;
-				width: 750rpx;
-				position: absolute;
-				background-color: #ddd;
-			}
+			bottom: 20rpx;
+			height: 1rpx;
+			width: 750rpx;
+			position: absolute;
+			background-color: #ddd;
 		}
 	}
 </style>

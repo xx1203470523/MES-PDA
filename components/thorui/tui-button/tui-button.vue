@@ -289,8 +289,10 @@
 		position: relative;
 	}
 
-	.tui-button__hover:active::after {
+	.tui-button__hover:active::after {		
+		/* #ifdef H5 */
 		content: '';
+		/* #endif */
 		position: absolute;
 		width: 100%;
 		height: 100%;

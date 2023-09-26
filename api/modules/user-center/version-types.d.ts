@@ -3,36 +3,41 @@ export type versionInputType = {
 	 * 版本号
 	 */
 	versionCode : number
-	
-	/**
-	 * 服务类型
-	 */
-	serviceType : 'wms'
 }
 
 export type versionOutputType = {
 	/**
 	 * 版本名称
 	 */
-	versionName : string
+	versionName ?: string
+
+	/**
+	 * 版本编号
+	 */
+	versionCode ?: number
 
 	/**
 	 * 下载地址
 	 */
-	url : string
+	url ?: string
 
 	/**
 	 * 更新说明
 	 */
-	content : string
+	content ?: string
 
 	/**
-	 * 是否有新版本
+	 * 是否启用
 	 */
-	hasNewVersion : boolean
+	isEnabled ?: boolean
 
 	/**
 	 * 是否强制更新
 	 */
-	isForceUpdate : boolean
+	isForceUpdate ?: boolean
+
+	/**
+	 * 创建时间
+	 */
+	createdOn ?: Date
 }

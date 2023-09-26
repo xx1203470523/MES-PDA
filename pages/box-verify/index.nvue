@@ -1,5 +1,5 @@
 <template>
-	<view class="sfcbox" :style="{height: pageHeight}">
+	<view class="sfcbox" :style="{minHeight: pageHeight}">
 		<uni-forms ref="form" class="p-2 bg-white border-bottom" :rules="page.rules" :modelValue="page.input">
 			<uni-forms-item label="箱编码" name="boxCode" required>
 				<uni-easyinput ref="boxCodeInputRef" v-model="page.input.boxCode" trim placeholder="扫描或输入"
@@ -11,13 +11,13 @@
 						@input="getPageAsync" @confirm="orderCodeConfirm"></uni-easyinput>
 				</view>
 			</uni-forms-item>
-			<tui-form-button text="核验" @click="verifyClickAsync">
-			</tui-form-button>
+			<tui-button type="black" @click="verifyClickAsync">
+				<tui-text text="核验" type="white"></tui-text>
+			</tui-button>
 		</uni-forms>
 
-		<uni-card class="flex-1">
-			<pda-list :items="page.result.items" :data="page.result.data" @click="orderCodeCopy"></pda-list>
-		</uni-card>
+		<pda-list :height="page.element.list.height" :items="page.result.items" :data="page.result.data"
+			@click="orderCodeCopy"></pda-list>
 	</view>
 </template>
 
@@ -94,5 +94,6 @@
 <style lang="scss" scoped>
 	.sfcbox {
 		display: flex;
+		flex-direction: column;
 	}
 </style>
