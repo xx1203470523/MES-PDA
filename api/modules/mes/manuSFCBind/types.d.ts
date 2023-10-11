@@ -1,3 +1,5 @@
+import { NgStateEnum } from './enum'
+
 /**
  * 明细对象
  */
@@ -10,7 +12,7 @@ export type ManuSfcBindOutputType = {
 	/**
 	 * 模组码
 	 */
-	sFC ?: string
+	sfc ?: string
 
 	/**
 	 * 绑定设备码
@@ -43,6 +45,11 @@ export type BindSFCOutputType = {
 	data: Array<ManuSfcBindOutputType>
 	
 	/**
+	 * NG状态
+	 */
+	ngState: NgStateEnum
+	
+	/**
 	 * NG位置
 	 */
 	nGLocationId: string
@@ -56,19 +63,24 @@ export type BindSFCInputType = {
 	 * 模组码
 	 */
 	sFC : string
+	
+	/**
+	 * 操作类型
+	 */
+	operateType?: NgStateEnum
 }
 
 /**
  * 解绑输入
  */
-export type UnBindSFCInputType = BindSFCInputDtoType & {
+export type UnBindSFCInputType = BindSFCInputType & {
 	bindSFCs?: any[]
 }
 
 /**
  * 换绑输入
  */
-export type SwitchBindInputType = BindSFCInputDtoType & {
+export type SwitchBindInputType = BindSFCInputType & {
 	/**
 	 * 旧设备ID
 	 */
@@ -88,7 +100,7 @@ export type SwitchBindInputType = BindSFCInputDtoType & {
 /**
  * 复投输入
  */
-export type RepeatInputType = BindSFCInputDtoType & {
+export type RepeatInputType = BindSFCInputType & {
 	/**
 	 * NG位置
 	 */

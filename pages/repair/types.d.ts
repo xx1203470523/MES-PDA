@@ -1,6 +1,8 @@
 import type { PdaListItemType } from '@/components/pda/pda-list/pda-list-types'
 import type { ManuSfcBindOutputType } from '@/api/modules/mes/manuSFCBind/types'
 
+import { NgStateEnum } from '@/api/modules/mes/manuSFCBind/enum'
+
 export type PageType = {
 	windowInfo ?: UniNamespace.GetWindowInfoResult
 
@@ -20,22 +22,27 @@ export type PageType = {
 		options : Array<{
 			text : string
 			value : number
+			disable?: boolean
 		}>
 	}
 
 	input : {
 		code : string
-		status : number
+		status : NgStateEnum
 		newBindCode : string
 	}
 
 	chose : {
-		detail : ManuSfcBindOutputType
+		detail : {
+			manuSfcCirculationEntity: ManuSfcBindOutputType
+			ngState: number
+		}
 	}
 
 	result : {
 		items : PdaListItemType[]
 		data : ManuSfcBindOutputType[]
+		status : NgStateEnum
 		isBindCount : number
 	}
 }

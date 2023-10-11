@@ -50,7 +50,7 @@ function fieldSetValue(field : any, fieldSplit : string[], floor : number, deep 
  * @returns
  */
 export function fieldGet(field : any, fieldStr : string) {
-	const fieldSplit = fieldStr.split('.')
+	const fieldSplit = fieldStr.split('.')	
 	return fieldGetValue(field, fieldSplit, 0, fieldSplit.length)
 }
 

@@ -7,7 +7,7 @@
 					@confirm="codeConfirmAsync"></uni-easyinput>
 			</uni-forms-item>
 			<uni-forms-item label="状态" name="status" required>
-				<uni-data-select v-model="page.input.status" :localdata="page.selected.options"
+				<uni-data-select v-model="page.input.status" :localdata="page.selected.options" @change="ngStateChangeHandleAsync"
 					:clear="false"></uni-data-select>
 			</uni-forms-item>
 		</uni-forms>
@@ -30,9 +30,9 @@
 					</view>
 				</view>
 			</template>
-			<template #right="{row}">
-				<view v-if="row.status === 1">
-					<tui-text text="解绑" :size="28" type="primary" @click="switchBindModalOpen(row)"></tui-text>
+			<template #right="{row}">				
+				<view v-if="row.ngState === 0">
+					<tui-text text="换绑" :size="28" type="primary" @click="switchBindModalOpen(row)"></tui-text>
 				</view>
 			</template>
 		</pda-list>
@@ -42,13 +42,13 @@
 		<tui-modal padding="20rpx" radius="0" :show="page.modal.switchBind.show" @cancel="switchBindModalClose" custom>
 			<uni-forms ref="switchBindFormRef" class="p-2 bg-white border-bottom" errShowType="toast"
 				:rules="page.formRules.switchBindRules" :modelValue="page.input">
-				<uni-forms-item label="条码" name="code" required>
+				<uni-forms-item style="align-items: center;" label="条码" name="code" required>
 					<tui-text :text="page.input.code" :size="28" type="gray"></tui-text>
 				</uni-forms-item>
-				<uni-forms-item label="旧条码" name="bindSFC" required>
-					<tui-text :text="page.chose.detail.bindSFC" :size="28" type="gray"></tui-text>
+				<uni-forms-item style="align-items: center;" label="原条码" name="bindSFC" required>
+					<tui-text :text="page.chose.detail.manuSfcCirculationEntity.sfc" :size="28" type="gray"></tui-text>
 				</uni-forms-item>
-				<uni-forms-item label="新条码" name="newBindCode" required>
+				<uni-forms-item style="align-items: center;" label="新条码" name="newBindCode" required>
 					<uni-easyinput ref="newBindCodeInputRef" v-model="page.input.newBindCode" trim
 						placeholder="扫描或输入"></uni-easyinput>
 				</uni-forms-item>
@@ -127,7 +127,7 @@
 	/**
 	 * 初始化
 	 */
-	const { page, codeConfirmAsync, switchBindModalOpen, switchBindModalConfirm, switchBindModalClose, unbindSFCAsync } = init({
+	const { page, codeConfirmAsync, ngStateChangeHandleAsync, switchBindModalOpen, switchBindModalConfirm, switchBindModalClose, unbindSFCAsync } = init({
 		formVaild,
 		switchBindFormVaild,
 		codeInputFocus,

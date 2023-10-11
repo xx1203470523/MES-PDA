@@ -6,10 +6,10 @@
 				<uni-easyinput ref="codeInputRef" v-model="page.input.code" trim placeholder="扫描或输入"
 					@confirm="codeConfirmAsync"></uni-easyinput>
 			</uni-forms-item>
-			<uni-forms-item label-width="160rpx" label="当前位置" name="nGLocationId" required>
+			<!-- <uni-forms-item label-width="160rpx" label="当前位置" name="nGLocationId" required>
 				<uni-data-select v-model="page.input.nGLocationId" :localdata="page.selected.options"
 					:clear="false"></uni-data-select>
-			</uni-forms-item>
+			</uni-forms-item> -->
 			<uni-forms-item label-width="160rpx" label="复投位置" name="repeatLocationId" required>
 				<uni-data-select v-model="page.input.repeatLocationId" :localdata="page.selected.options"
 					:clear="false"></uni-data-select>

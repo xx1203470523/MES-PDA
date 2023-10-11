@@ -35,3 +35,12 @@ export function switchBindAsync(data : SwitchBindInputType) {
 export function repeatManuSFCAsync(data : RepeatInputType) {
 	return request.post({ url: `/ManuSFCBind/pda/repeatManu`, data, version: 'v1' })
 }
+
+/**
+ * 维修确认
+ * @param {RepeatInputType} data 
+ * @return 
+ */ 
+export function repairSFCAsync(data : BindSFCInputType) {
+	return request.get({ url: `/ManuSFCBind/pda/repairok`, data, version: 'v1' })
+}

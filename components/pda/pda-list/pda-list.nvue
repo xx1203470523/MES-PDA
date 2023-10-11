@@ -17,7 +17,7 @@
 								<view v-for="(item, itemIndex) in items" :key="itemIndex">
 									<view class="pda-list-container-item-row__body-item">
 										<text class="sub-label">{{ item.label }}：</text>
-										<text class="sub-value">{{ fieldGet(i, item.field) || '' }}</text>
+										<text class="sub-value">{{ valueHandler(i, item) || '' }}</text>
 									</view>
 								</view>
 							</view>
@@ -27,7 +27,6 @@
 							<slot name="right" :row="i"></slot>
 						</view>
 						<view v-if="index < data.length - 1" class="pda-list-item-border">
-
 						</view>
 					</view>
 				</scroll-view>
@@ -38,6 +37,8 @@
 </template>
 
 <script lang="ts" name="received" setup>
+	import type { PdaListItemType } from './pda-list-types'
+
 	import { reactive, onMounted, nextTick } from 'vue'
 
 	import { fieldGet } from '@/utils/object-utils'
@@ -83,6 +84,18 @@
 	}
 
 	/**
+	 * 值处理
+	 */
+	function valueHandler(i : any, item : PdaListItemType) {
+		const _value = fieldGet(i, item.field)
+		if (item.valuePreprocessing) {
+			return item.valuePreprocessing(_value)
+		} else {
+			return _value
+		}
+	}
+
+	/**
 	 * 初始化元素
 	 */
 	async function initElement() {
@@ -116,7 +129,7 @@
 
 		.pda-list-container-body {
 			padding-top: 20rpx;
-			
+
 			display: flex;
 			flex-direction: column;
 			flex: 1;

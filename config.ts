@@ -9,10 +9,10 @@ const appConfig = {
 	// mes远程地址
 	
 	// 正式环境
-	mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:9018/api' : 'http://59.40.181.33:8580/api',
+	// mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:9018/api' : 'http://59.40.181.33:8580/api',
 	
 	// 测试环境
-	// mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:9018/api' : 'http://10.10.79.12:9018/api',
+	mesRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:11701/api' : 'http://10.10.79.12:9018/api',
 
 	// 用户中心远程地址
 	

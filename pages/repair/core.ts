@@ -3,7 +3,8 @@ import type { ManuSfcBindOutputType } from '@/api/modules/mes/manuSFCBind/types'
 
 import { reactive } from "vue";
 
-import { listAsync, unbindAsync, switchBindAsync } from '@/api/modules/mes/manuSFCBind/index'
+import { NgStateEnum } from '@/api/modules/mes/manuSFCBind/enum'
+import { listAsync, unbindAsync, switchBindAsync, repairSFCAsync } from '@/api/modules/mes/manuSFCBind/index'
 
 
 export function init({
@@ -34,7 +35,6 @@ export function init({
 					]
 				}
 			}
-
 		},
 		modal: {
 			switchBind: {
@@ -45,31 +45,53 @@ export function init({
 		selected: {
 			options: [
 				{
-					text: 'OK',
-					value: 0
+					text: 'NG',
+					value: 0,
+					// disable: true
 				},
 				{
-					text: 'NG',
+					text: 'OK',
 					value: 1
 				}
 			]
 		},
 		input: {
 			code: '',
-			status: 0,
+			status: NgStateEnum.NG,
 			newBindCode: ''
 		},
 		chose: {
-			detail: {}
+			detail: {
+				manuSfcCirculationEntity: {},
+				ngState: 0
+			}
 		},
 		result: {
 			items: [
 				{
 					label: '绑定条码',
-					field: 'bindSFC'
+					field: 'manuSfcCirculationEntity.sfc'
+				},
+				{
+					label: '位置',
+					field: 'manuSfcCirculationEntity.location'
+				},
+				{
+					label: 'NG状态',
+					field: 'ngState',
+					valuePreprocessing(v) {
+						switch (v) {
+							case 0:
+								return 'NG'
+
+							case 1:
+								return 'OK'
+						}
+					}
 				}
 			],
 			data: [],
+			status: NgStateEnum.NG,
 			isBindCount: 0
 		}
 	});
@@ -80,11 +102,14 @@ export function init({
 	async function codeConfirmAsync() {
 		if (await formVaild()) {
 			try {
-				const { data } = await listAsync({
+				const { data, ngState } = await listAsync({
 					sFC: page.input.code
 				})
 
+				page.input.status = ngState
+
 				page.result.data = data
+				page.result.status = ngState
 				page.result.isBindCount = data.filter(m => m.status === 1).length
 			} catch { }
 		}
@@ -92,9 +117,39 @@ export function init({
 	}
 
 	/**
+	 * NG状态改变
+	 * @param {number} e 
+	 * @return 
+	 */
+	async function ngStateChangeHandleAsync(e : number) {
+		if (!page.input.code) {
+			return
+		}
+
+		if (e === NgStateEnum.OK && page.result.status !== NgStateEnum.OK) {
+			uni.showModal({
+				title: '确认更新所有状态为OK吗？',
+				async success({ confirm }) {
+					if (confirm) {
+						await repairSFCAsync({
+							sFC: page.input.code,
+							operateType: NgStateEnum.OK
+						})
+
+						uni.showToast({
+							title: '状态已更新',
+							icon: 'success'
+						})
+					}
+				}
+			})
+		}
+	}
+
+	/**
 	 * 换绑窗口打开
 	 */
-	function switchBindModalOpen(row : ManuSfcBindOutputType) {
+	function switchBindModalOpen(row : { manuSfcCirculationEntity : ManuSfcBindOutputType, ngState : number }) {
 		page.modal.switchBind.show = true
 		page.chose.detail = row
 
@@ -113,8 +168,8 @@ export function init({
 			try {
 				await switchBindAsync({
 					sFC: page.input.code,
-					oldBindId: page.chose.detail.id,
-					oldBindSFC: page.chose.detail.bindSFC,
+					oldBindId: page.chose.detail.manuSfcCirculationEntity.id,
+					oldBindSFC: page.chose.detail.manuSfcCirculationEntity.sfc,
 					newBindSFC: page.input.newBindCode
 				})
 				uni.showToast({
@@ -137,7 +192,10 @@ export function init({
 	 */
 	function switchBindModalClose() {
 		page.modal.switchBind.show = false
-		page.chose.detail = {}
+		page.chose.detail = {
+			manuSfcCirculationEntity: {},
+			ngState: 0
+		}
 		codeInputFocus()
 	}
 
@@ -172,6 +230,7 @@ export function init({
 	return {
 		page,
 		codeConfirmAsync,
+		ngStateChangeHandleAsync,
 		switchBindModalOpen,
 		switchBindModalConfirm,
 		switchBindModalClose,
