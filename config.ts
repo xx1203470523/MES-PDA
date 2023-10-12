@@ -17,10 +17,10 @@ const appConfig = {
 	// 用户中心远程地址
 	
 	// 测试环境
-	// userCenterRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:9015/prod-api' : 'http://10.10.79.12:9015/prod-api'
+	userCenterRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:9015/prod-api' : 'http://10.10.79.12:9015/prod-api'
 	
 	// 正式环境
-	userCenterRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:8015/prod-api' : 'http://59.40.181.33:8581/prod-api'
+	// userCenterRemoteUrl: process.env.NODE_ENV === 'development' ? 'http://10.10.79.12:8015/prod-api' : 'http://59.40.181.33:8581/prod-api'
 
 	// 用户中心
 

@@ -75,20 +75,20 @@ export function init({
 				{
 					label: '位置',
 					field: 'manuSfcCirculationEntity.location'
-				},
-				{
-					label: 'NG状态',
-					field: 'ngState',
-					valuePreprocessing(v) {
-						switch (v) {
-							case 0:
-								return 'NG'
-
-							case 1:
-								return 'OK'
-						}
-					}
 				}
+				// {
+				// 	label: 'NG状态',
+				// 	field: 'ngState',
+				// 	valuePreprocessing(v) {
+				// 		switch (v) {
+				// 			case 0:
+				// 				return 'NG'
+
+				// 			case 1:
+				// 				return 'OK'
+				// 		}
+				// 	}
+				// }
 			],
 			data: [],
 			status: NgStateEnum.NG,
