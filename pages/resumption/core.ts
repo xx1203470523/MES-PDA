@@ -13,7 +13,7 @@ export function init({
 	const page = reactive<PageType>({
 		formRules: {
 			pageRules: {
-				code: {
+				sFC: {
 					rules: [
 						{
 							required: true,
@@ -43,7 +43,7 @@ export function init({
 			options: []
 		},
 		input: {
-			code: '',
+			sFC: '',
 			nGLocationId: '',
 			repeatLocationId: ''
 		},
@@ -51,7 +51,7 @@ export function init({
 			items: [
 				{
 					label: '绑定条码',
-					field: 'bindSFC'
+					field: 'manuSfcCirculationEntity.sfc'
 				}
 			],
 			data: [],
@@ -65,7 +65,7 @@ export function init({
 	async function codeConfirmAsync() {
 		try {
 			const { data, nGLocationId } = await listAsync({
-				sFC: page.input.code
+				sFC: page.input.sFC
 			})
 
 

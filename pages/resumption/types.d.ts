@@ -22,7 +22,7 @@ export type PageType = {
 		/**
 		 * 条码
 		 */
-		code : string
+		sFC : string
 		/**
 		 * NG位置
 		 */

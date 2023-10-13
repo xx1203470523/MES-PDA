@@ -3,7 +3,7 @@
 		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="toast"
 			:rules="page.formRules.pageRules" :modelValue="page.input">
 			<uni-forms-item label-width="160rpx" label="条码" name="code" required>
-				<uni-easyinput ref="codeInputRef" v-model="page.input.code" trim placeholder="扫描或输入"
+				<uni-easyinput ref="codeInputRef" v-model="page.input.sFC" trim placeholder="扫描或输入"
 					@confirm="codeConfirmAsync"></uni-easyinput>
 			</uni-forms-item>
 			<!-- <uni-forms-item label-width="160rpx" label="当前位置" name="nGLocationId" required>
