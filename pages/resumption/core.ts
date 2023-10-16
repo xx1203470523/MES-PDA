@@ -5,6 +5,7 @@ import { reactive } from "vue";
 import { listAsync, repeatManuSFCAsync } from '@/api/modules/mes/manuSFCBind/index'
 import { listAsync as procProcedureListAsync } from '@/api/modules/mes/procProcedure/index'
 
+import { debounce } from '@/utils/fn-utils'
 
 export function init({
 	formVaild,
@@ -42,6 +43,7 @@ export function init({
 		selected: {
 			options: []
 		},
+		timeout: {},
 		input: {
 			sFC: '',
 			nGLocationId: '',
@@ -60,10 +62,26 @@ export function init({
 	});
 
 	/**
+	 * 页面清理
+	 * @return 
+	 */
+	function clear() {
+		page.result.data = []
+
+		if (page.timeout.codeInput) {
+			clearTimeout(page.timeout.codeInput)
+		}
+	}
+
+	/**
 	 * 条码确认
 	 */
 	async function codeConfirmAsync() {
 		try {
+			if(!page.input.sFC){
+				throw '条码为空'
+			}
+			
 			const { data, nGLocationId } = await listAsync({
 				sFC: page.input.sFC
 			})
@@ -71,9 +89,19 @@ export function init({
 
 			page.result.data = data
 			page.input.nGLocationId = nGLocationId
-		} catch { }
-		
+		} catch {
+			clear()
+		}
+
 		codeInputFocus()
+	}
+
+	/**
+	 * 条码输入
+	 * @return 
+	 */
+	async function codeInputAsync() {
+		page.timeout.codeInput = debounce(codeConfirmAsync, page.timeout.codeInput, 300)()
 	}
 
 	/**
@@ -138,6 +166,7 @@ export function init({
 		page,
 		initAsync,
 		codeConfirmAsync,
+		codeInputAsync,
 		repeatConfirmAsync
 	}
 }

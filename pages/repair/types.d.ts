@@ -38,6 +38,10 @@ export type PageType = {
 			ngState: number
 		}
 	}
+	
+	timeout : {
+		codeInput?: number
+	}
 
 	result : {
 		items : PdaListItemType[]

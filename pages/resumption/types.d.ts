@@ -4,15 +4,28 @@ import type { ManuSfcBindOutputType } from '@/api/modules/mes/manuSFCBind/types'
 export type PageType = {
 	windowInfo ?: UniNamespace.GetWindowInfoResult
 
+	/**
+	 * 表单规则
+	 */
 	formRules : {
 		pageRules : any
 	}
 
+	/**
+	 * 选项配置
+	 */
 	selected : {
 		options : Array<{
 			text : string
 			value : string
 		}>
+	}
+	
+	/**
+	 * 计时器
+	 */
+	timeout : {
+		codeInput?: number
 	}
 
 	/**

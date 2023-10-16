@@ -158,23 +158,22 @@
 						justify-content: space-between;
 
 						.pda-list-container-item-row__body-content {
+							width: 550rpx;
 							display: flex;
 							flex-direction: column;
 							justify-content: center;
 
 							.pda-list-container-item-row__body-item {
-								display: flex;
-								flex-direction: row;
-								align-items: center;
-
 								padding-bottom: 10rpx;
 
 								.sub-label {
+									float: left;
 									color: #666;
 								}
 
 								.sub-value {
 									color: #333;
+									word-wrap: break-word;
 								}
 							}
 						}

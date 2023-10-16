@@ -6,6 +6,7 @@ import { reactive } from "vue";
 import { NgStateEnum } from '@/api/modules/mes/manuSFCBind/enum'
 import { listAsync, unbindAsync, switchBindAsync, repairSFCAsync } from '@/api/modules/mes/manuSFCBind/index'
 
+import { debounce } from '@/utils/fn-utils'
 
 export function init({
 	formVaild,
@@ -46,8 +47,7 @@ export function init({
 			options: [
 				{
 					text: 'NG',
-					value: 0,
-					// disable: true
+					value: 0
 				},
 				{
 					text: 'OK',
@@ -66,6 +66,7 @@ export function init({
 				ngState: 0
 			}
 		},
+		timeout: {},
 		result: {
 			items: [
 				{
@@ -76,19 +77,6 @@ export function init({
 					label: '位置',
 					field: 'manuSfcCirculationEntity.location'
 				}
-				// {
-				// 	label: 'NG状态',
-				// 	field: 'ngState',
-				// 	valuePreprocessing(v) {
-				// 		switch (v) {
-				// 			case 0:
-				// 				return 'NG'
-
-				// 			case 1:
-				// 				return 'OK'
-				// 		}
-				// 	}
-				// }
 			],
 			data: [],
 			status: NgStateEnum.NG,
@@ -97,23 +85,53 @@ export function init({
 	});
 
 	/**
+	 * 页面清理
+	 * @return 
+	 */
+	function clear() {
+		page.result.data = []
+
+		if (page.timeout.codeInput) {
+			clearTimeout(page.timeout.codeInput)
+		}
+	}
+
+	/**
 	 * 条码确认
 	 */
 	async function codeConfirmAsync() {
-		if (await formVaild()) {
-			try {
-				const { data, ngState } = await listAsync({
-					sFC: page.input.code
-				})
+		try {
+			if (!page.input.code) {
+				throw '条码不可为空'
+			}
 
-				page.input.status = ngState
+			if (!await formVaild()) {
+				throw '表单验证失败'
+			}
 
-				page.result.data = data
-				page.result.status = ngState
-				page.result.isBindCount = data.filter(m => m.status === 1).length
-			} catch { }
+
+			const { data, ngState } = await listAsync({
+				sFC: page.input.code
+			})
+
+			page.input.status = ngState
+			page.result.data = data
+			page.result.status = ngState
+			page.result.isBindCount = data.filter(m => m.status === 1).length
+
+		}
+		catch {
+			clear()
 		}
 		codeInputFocus()
+	}
+
+	/**
+	 * 条码输入
+	 * @return 
+	 */
+	async function codeInputAsync() {
+		page.timeout.codeInput = debounce(codeConfirmAsync, page.timeout.codeInput, 300)()
 	}
 
 	/**
@@ -217,6 +235,10 @@ export function init({
 							await unbindAsync({
 								sFC: page.input.code
 							})
+							uni.showToast({
+								title: '全部解绑成功',
+								icon: 'success'
+							});
 						} catch { }
 						uni.hideLoading()
 					}
@@ -230,6 +252,7 @@ export function init({
 	return {
 		page,
 		codeConfirmAsync,
+		codeInputAsync,
 		ngStateChangeHandleAsync,
 		switchBindModalOpen,
 		switchBindModalConfirm,

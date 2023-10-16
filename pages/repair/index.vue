@@ -1,10 +1,10 @@
 <template>
 	<view class="sfcbox" :style="{minHeight: pageHeight}">
-		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="toast"
+		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="undertext"
 			:rules="page.formRules.pageRules" :modelValue="page.input">
 			<uni-forms-item label="条码" name="code" required>
 				<uni-easyinput ref="codeInputRef" v-model="page.input.code" trim placeholder="扫描或输入"
-					@confirm="codeConfirmAsync"></uni-easyinput>
+				@input="codeInputAsync"></uni-easyinput>
 			</uni-forms-item>
 			<uni-forms-item label="状态" name="status" required>
 				<uni-data-select v-model="page.input.status" :localdata="page.selected.options"
@@ -122,7 +122,7 @@
 	/**
 	 * 初始化
 	 */
-	const { page, codeConfirmAsync, ngStateChangeHandleAsync, switchBindModalOpen, switchBindModalConfirm, switchBindModalClose, unbindSFCAsync } = init({
+	const { page, codeInputAsync, ngStateChangeHandleAsync, switchBindModalOpen, switchBindModalConfirm, switchBindModalClose, unbindSFCAsync } = init({
 		formVaild,
 		switchBindFormVaild,
 		codeInputFocus,
