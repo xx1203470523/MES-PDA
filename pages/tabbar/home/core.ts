@@ -23,6 +23,11 @@ export function init() {
 							icon: '/static/imgs/home/resumption.png',
 							title: '复投',
 							url: '/pages/resumption/index'
+						},
+						{
+							icon: '/static/imgs/home/resumption.png',
+							title: '在制',
+							url: '/pages/process/index'
 						}
 					]
 				}

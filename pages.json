@@ -52,6 +52,19 @@
 			"style": {
 				"navigationBarTitleText": "复投"
 			}
+		},
+		{
+			"path": "pages/process/index",
+			"style": {
+				"navigationBarTitleText": "在制",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
 		}
 	],
 	"easycom": {
