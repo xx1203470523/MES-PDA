@@ -2,7 +2,7 @@
  * 查询SFC在在制信息，以及工艺路线的工序
  */
 export type queryProcessOutputType = {
-	processName: string,
+	processStatus: string,
 	procedureName: string
 }
 

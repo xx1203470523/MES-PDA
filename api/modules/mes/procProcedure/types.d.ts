@@ -8,6 +8,14 @@ export type ProcProcedureOutputType = {
 }
 
 /**
+ * 工序
+ */
+export type ProcProcedureSelectType = {
+	text: string
+	value: string
+}
+
+/**
  * 分页输入
  */
 export type PageInputType = {

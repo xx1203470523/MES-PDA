@@ -65,6 +65,19 @@
 					}
 				}
 			}
+		},
+		{
+			"path": "pages/bindSFC/index",
+			"style": {
+				"navigationBarTitleText": "绑定解绑",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
 		}
 	],
 	"easycom": {

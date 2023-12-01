@@ -25,9 +25,14 @@ export function init() {
 							url: '/pages/resumption/index'
 						},
 						{
-							icon: '/static/imgs/home/resumption.png',
+							icon: '/static/imgs/home/process.png',
 							title: '在制',
 							url: '/pages/process/index'
+						},
+						{
+							icon: '/static/imgs/home/bind.png',
+							title: '绑定解绑',
+							url: '/pages/bindSFC/index'
 						}
 					]
 				}

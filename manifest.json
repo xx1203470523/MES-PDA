@@ -1,9 +1,9 @@
 {
     "name" : "PDA",
-    "appid" : "__UNI__B60DDEF",
+    "appid" : "__UNI__280901B",
     "description" : "MES PDA",
-    "versionName" : "1.0.0.3",
-    "versionCode" : 1003,
+    "versionName" : "1.0.0.4",
+    "versionCode" : 1004,
     "transformPx" : false,
     "app-plus" : {
         /* 5+App特有相关 */

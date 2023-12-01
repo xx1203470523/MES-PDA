@@ -2,34 +2,18 @@
 	<view class="sfcbox" :style="{minHeight: pageHeight}">
 		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="undertext" :modelValue="page.input">
 			<uni-forms-item label="条码" name="sfc" required>
-				<uni-easyinput ref="sfcInputRef" v-model="page.input.sfc" trim placeholder="请扫描条码"
-				@input="scanSfcAsync"></uni-easyinput>
+				<uni-easyinput ref="sfcInputRef" v-model="page.input.sfc" trim placeholder="请扫描条码" @confirm="scanSfcAsync"></uni-easyinput>
 			</uni-forms-item>
-			<uni-forms-item label="绑定条码" name="bindSfc" required>
+<!-- 			<uni-forms-item label="绑定条码" name="bindSfc" required>
 				<uni-easyinput ref="bindSfcInputRef" v-model="page.input.bindSfc" trim placeholder="请扫描绑定条码"
-				@input="scanBindSfcAsync"></uni-easyinput>
-			</uni-forms-item>
+					@input="scanBindSfcAsync" @confirm="scanBindSfcAsync"></uni-easyinput>
+			</uni-forms-item> -->
 		</uni-forms>
 
-		<pda-list >
-			<template #header>
-				<view class="flex-row flex-justify-between">
-					<view class="flex-row flex-1">
-						<view class="flex-row">
-							<tui-text text="绑定明细：" :size="28"></tui-text>
-							<tui-text :text="page.dataList" type="danger" :size="28"></tui-text>
-						</view>
-						<view class="ml-4 flex-row">
-							<tui-text text="已绑定：" :size="28"></tui-text>
-							<tui-text :text="page.dataList" type="danger" :size="28"></tui-text>
-						</view>
-					</view>
-					<view>
-						<tui-text text="全部解绑" :size="28" type="primary" ></tui-text>
-					</view>
-				</view>
-			</template>
+		<pda-list :items="page.dataList.items" :data="page.dataList.data" @query="queryListAsync">
+			<template #right={row}> <a href='#' @click="deleteBindSfcAsync(row)">解绑</a></template>
 		</pda-list>
+
 	</view>
 </template>
 
@@ -43,6 +27,7 @@
 	const formRef = ref()
 	const sfcInputRef = ref()
 	const bindSfcInputRef = ref()
+	const paging = ref()
 
 	/**
 	 * 初始化焦点
@@ -67,7 +52,7 @@
 	/**
 	 * 初始化
 	 */
-	const { page, scanSfcAsync, scanBindSfcAsync } = init({
+	const { page, scanSfcAsync, scanBindSfcAsync, queryListAsync, deleteBindSfcAsync } = init({
 		bindSfcOnFocus
 	})
 
