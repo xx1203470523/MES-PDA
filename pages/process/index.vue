@@ -2,8 +2,7 @@
 	<view class="sfcbox" :style="{minHeight: pageHeight}">
 		<uni-forms ref="formRef" class="p-2 bg-white border-bottom" errShowType="undertext" :modelValue="page.input">
 			<uni-forms-item label="条码" name="sfc" required>
-				<uni-easyinput ref="sfcInputRef" v-model="page.input.sfc" required trim placeholder="请扫描条码"
-					@input="scanSfcAsync" @confirm="scanSfcAsync"></uni-easyinput>
+				<uni-easyinput ref="sfcInputRef" v-model="page.input.sfc" required trim placeholder="请扫描条码"  @confirm="scanSfcAsync"></uni-easyinput>
 			</uni-forms-item>
 			<view class="text-box" scroll-y="true">
 				<tui-text>

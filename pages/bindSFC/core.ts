@@ -52,10 +52,13 @@ export function init({
 	 * 条码扫描
 	 */
 	async function scanSfcAsync() {
+		try {
+			await queryListAsync()
 
-		await queryListAsync()
+			bindSfcOnFocus()
+		} catch {
 
-		bindSfcOnFocus()
+		}
 	}
 
 	/**
@@ -81,7 +84,7 @@ export function init({
 		try {
 			uni.showModal({
 				title: "警告",
-				content:'确认解绑该条码',
+				content: '确认解绑该条码',
 				success: async ({ confirm }) => {
 					if (confirm) {
 						await delBindSfcAsync(row.id)

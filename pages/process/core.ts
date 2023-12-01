@@ -35,24 +35,35 @@ export function init({ }) {
 		}
 
 		if (page.input.sfc) {
-			//获取在制信息
-			const processInfo = await getSfcProcessInfoAsync(query)
+			try {
+				//获取在制信息
+				const processInfo = await getSfcProcessInfoAsync(query)
 
-			if (processInfo.processStatus == '1') processInfo.processStatus = '排队中'
-			if (processInfo.processStatus == '2') processInfo.processStatus = '活动中'
+				if (processInfo.processStatus == '1') processInfo.processStatus = '排队中'
+				else if (processInfo.processStatus == '2') processInfo.processStatus = '活动中'
+				else if (processInfo.processStatus == '3') processInfo.processStatus = '已完成'
 
-			page.info.procedureName = processInfo.procedureName
-			page.info.processStatus = processInfo.processStatus
+				page.info.procedureName = processInfo.procedureName
+				page.info.processStatus = processInfo.processStatus
 
-			await loadProcedureListAsync()
+				await loadProcedureListAsync()
+			} catch {
+
+			}
+
+
 		}
 
 	}
 
 	async function loadProcedureListAsync() {
-		const list = await getAllAsync()
-
-		page.info.procedureListData = list;
+		try {
+			const list = await getAllAsync()
+			page.info.procedureListData = list;
+		}
+		catch{
+			
+		}
 
 	}
 
