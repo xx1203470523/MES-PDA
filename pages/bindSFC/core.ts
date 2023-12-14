@@ -3,6 +3,7 @@ import type { scanType } from './types'
 import { reactive } from "vue";
 
 import { getBindSfcAsync, delBindSfcAsync } from '@/api/modules/mes/manuSfcCirculation/index'
+import { getByCodesAsync } from '@/api/modules/mes/procProcedure/index'
 
 export function init({
 	bindSfcOnFocus
@@ -15,7 +16,9 @@ export function init({
 		},
 		input: {
 			sfc: '',
-			bindSfc: ''
+			bindSfc: '',
+			procedureId: 0,
+			procedureList: []
 		},
 		dataList: {
 			items: [
@@ -80,7 +83,28 @@ export function init({
 
 	}
 
-	async function deleteBindSfcAsync(row) {
+	async function bindSfcAsync(){
+		//校验数据
+		let msg = ''
+		if(page.input.sfc) msg = '条码不能为空！'
+		else if(page.input.bindSfc) msg = '绑定条码不能为空！'
+		else if(page.input.procedureId) msg = '请选择工序！'
+		
+		if(msg != '') {
+			uni.showToast({
+				title:msg
+			})
+			return;
+		}
+		
+	}
+
+	/**
+	 * 接触绑定关系
+	 * @param {any} row 
+	 * @return 
+	 */
+	async function deleteBindSfcAsync(row : any) {
 		try {
 			uni.showModal({
 				title: "警告",
@@ -113,6 +137,7 @@ export function init({
 		queryListAsync,
 		scanSfcAsync,
 		scanBindSfcAsync,
-		deleteBindSfcAsync
+		deleteBindSfcAsync,
+		getByCodesAsync
 	}
 }

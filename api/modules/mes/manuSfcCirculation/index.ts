@@ -10,3 +10,7 @@ export function getBindSfcAsync(sfc : string) : Promise<Array<bindSfcType>> {
 export function delBindSfcAsync(data : any) {
 	return request.post({ url: `/ManuSFCBind/pda/bindsfc/del`, version: 'v1', data })
 }
+
+export function bindSfcAsync(data : any) {
+	return request.post({ url: `/ManuSFCBind/pda/bindsfc`, version: 'v1', data })
+}

@@ -11,7 +11,9 @@ export type scanType = {
 	
 	input : {
 		sfc : string		
-		bindSfc : string
+		bindSfc : string,
+		procedureId: number,
+		procedureList: any
 	}
 	
 	dataList : {
