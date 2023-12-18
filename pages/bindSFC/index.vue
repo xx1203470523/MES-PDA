@@ -7,7 +7,7 @@
 			</uni-forms-item>
 			<uni-forms-item label="绑定条码" name="bindSfc" required>
 				<uni-easyinput ref="bindSfcInputRef" v-model="page.input.bindSfc" trim placeholder="请扫描绑定条码"
-					@input="scanBindSfcAsync" @confirm="scanBindSfcAsync"></uni-easyinput>
+					@confirm="scanBindSfcAsync"></uni-easyinput>
 			</uni-forms-item>
 			<uni-forms-item label="绑定工序" name="procedureId" required>
 				<uni-data-select placeholder="请选择工序" required :localdata="page.input.procedureList"

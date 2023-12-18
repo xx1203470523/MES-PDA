@@ -2,7 +2,7 @@ import type { scanType } from './types'
 
 import { reactive } from "vue";
 
-import { getBindSfcAsync, delBindSfcAsync } from '@/api/modules/mes/manuSfcCirculation/index'
+import { getBindSfcAsync, delBindSfcAsync, bindSfcAsync as bindSfcApiAsync } from '@/api/modules/mes/manuSfcCirculation/index'
 import { getByCodesAsync } from '@/api/modules/mes/procProcedure/index'
 
 export function init({
@@ -69,34 +69,44 @@ export function init({
 	 */
 	async function scanBindSfcAsync() {
 
-		try {
-
-			await queryListAsync()
-
-		} catch {
-			uni.showToast({
-				title: '查询绑定关系失败！'
-			})
-		} finally {
-			bindSfcOnFocus()
-		}
-
-	}
-
-	async function bindSfcAsync(){
 		//校验数据
 		let msg = ''
-		if(page.input.sfc) msg = '条码不能为空！'
-		else if(page.input.bindSfc) msg = '绑定条码不能为空！'
-		else if(page.input.procedureId) msg = '请选择工序！'
-		
-		if(msg != '') {
+		if (!page.input.sfc) msg = '条码不能为空！'
+		else if (!page.input.bindSfc) msg = '绑定条码不能为空！'
+		else if (!page.input.procedureId) msg = '请选择工序！'
+
+		if (msg != '') {
 			uni.showToast({
-				title:msg
+				title: msg
 			})
 			return;
 		}
-		
+
+		const bindData = {
+			sfc: page.input.sfc,
+			bindSfc: page.input.bindSfc,
+			procedureId: page.input.procedureId
+		}
+
+		try {
+
+			await bindSfcApiAsync(bindData)
+
+			uni.showToast({
+				title: '绑定成功！',
+				success: async () => {
+					await queryListAsync()
+				}
+			})
+
+		} catch (e) {
+			console.log(e.message)
+		} finally {
+			await queryListAsync()
+			
+			bindSfcOnFocus()
+		}
+
 	}
 
 	/**
@@ -127,10 +137,7 @@ export function init({
 				title: '解绑失败，请重试！'
 			})
 		}
-
-
 	}
-
 
 	return {
 		page,
